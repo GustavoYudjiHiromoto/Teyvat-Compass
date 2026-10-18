@@ -29,20 +29,21 @@ O modo sem configuração continua funcionando localmente. Para habilitar cadast
 
 1. Crie um projeto Supabase e copie `.env.example` para `.env`.
 2. Preencha `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` com a URL do projeto e a chave publicável. Projetos que ainda usam a chave `anon` também podem usar `VITE_SUPABASE_ANON_KEY`.
-3. No SQL Editor do projeto Supabase, execute `supabase/schema.sql` para criar a tabela e as políticas de acesso. Se você já executou uma versão anterior, rode o arquivo atualizado novamente; ele adiciona as colunas de Showcase e objetivos sem apagar o perfil existente.
+3. No SQL Editor do projeto Supabase, execute `supabase/schema.sql` para criar a tabela e as políticas de acesso. Se você já executou uma versão anterior, rode o arquivo atualizado novamente; ele adiciona as colunas de Showcase, objetivos e formações personalizadas sem apagar o perfil existente.
 4. Em **Authentication → URL Configuration**, inclua `http://localhost:5173` nas URLs de redirecionamento. Adicione também o endereço do site quando publicar.
 5. Para habilitar a importação de Showcase, instale e autentique o [Supabase CLI](https://supabase.com/docs/guides/cli), vincule o projeto (`supabase link --project-ref SEU_PROJECT_REF`) e publique a função: `supabase functions deploy enka-showcase`. Execute o deploy novamente após atualizar a função.
 6. Reinicie `npm run dev` e use o menu no topo para criar uma conta ou entrar.
 
-No primeiro login sem perfil na nuvem, o elenco, as armas, o Showcase e os objetivos salvos localmente são copiados para a conta. A partir daí, alterações são sincronizadas. A tabela permite que cada usuário leia e altere apenas o próprio perfil. Nunca coloque uma chave `service_role` no frontend; use somente a chave pública.
+No primeiro login sem perfil na nuvem, o elenco, as armas, o Showcase, os objetivos e as formações personalizadas salvos localmente são copiados para a conta. A partir daí, alterações são sincronizadas. A tabela permite que cada usuário leia e altere apenas o próprio perfil. Nunca coloque uma chave `service_role` no frontend; use somente a chave pública.
 
 ## Escopo atual
 
 - Seleção de personagens possuídos com salvamento automático em `localStorage`.
-- Quatro sugestões iniciais de time, ranqueadas conforme os personagens marcados no elenco.
-- Substitutos por função, sem repetir personagens, com explicação das trocas e posições ainda em falta.
+- Seis sugestões iniciais de time, ranqueadas conforme os personagens marcados no elenco.
+- Substitutos por função, sem repetir personagens, com explicação das trocas e posições ainda em falta; você pode escolher uma sugestão avaliada ou qualquer personagem do seu elenco em cada posição e restaurar a sugestão automática. Escolhas manuais não têm sinergia avaliada.
 - Builds iniciais por personagem nos times sugeridos, com armas alternativas, artefatos, atributos e links para os guias da KeqingMains.
 - Marcação de armas possuídas, priorizadas nas recomendações; no modo local os dados ficam salvos neste navegador.
+- Preferências manuais de substituição salvas no navegador e sincronizadas entre dispositivos pelo Supabase quando a coluna `team_slot_preferences` estiver disponível.
 - Conta por e-mail e senha e sincronização opcional do elenco e das armas pelo Supabase.
 - Importação dos personagens visíveis no Showcase público por UID, através da Enka.Network.
 - Builds do Showcase com nível, constelação, arma, artefatos e atributos atuais, comparados às recomendações cadastradas.

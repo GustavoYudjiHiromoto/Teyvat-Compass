@@ -4,6 +4,7 @@ create table if not exists public.player_profiles (
   owned_weapons text[] not null default '{}',
   enka_showcase jsonb not null default '{}'::jsonb,
   goals jsonb not null default '[]'::jsonb,
+  team_slot_preferences jsonb default null,
   updated_at timestamptz not null default now()
 );
 
@@ -12,6 +13,9 @@ alter table public.player_profiles
 
 alter table public.player_profiles
   add column if not exists goals jsonb not null default '[]'::jsonb;
+
+alter table public.player_profiles
+  add column if not exists team_slot_preferences jsonb default null;
 
 alter table public.player_profiles enable row level security;
 

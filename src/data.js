@@ -99,6 +99,37 @@ export const teams = [
       { characterId: 'sucrose', role: 'Suporte flexível', alternatives: [{ characterId: 'lynette', reason: 'espalha elementos e oferece suporte Anemo' }, { characterId: 'traveler', reason: 'agrupa inimigos e ajuda a espalhar elementos' }] },
     ],
   },
+  {
+    id: 'freeze-quickswap', title: 'Congelamento rápido', subtitle: 'Composição acessível para manter inimigos congelados', difficulty: 'Acessível', priority: 4, tags: ['Congelamento', 'Quickswap', 'Acessível'],
+    explanation: 'Kaeya e Rosaria fornecem dano e partículas Cryo; Barbara aplica Hydro e cura, enquanto Sucrose agrupa inimigos e reduz resistências com Sombra Verde. O time rende melhor contra inimigos que podem ser congelados.',
+    sources: [
+      { label: 'Kaeya · KQM', url: 'https://keqingmains.com/q/kaeya-quickguide/' },
+      { label: 'Rosaria · KQM', url: 'https://keqingmains.com/q/rosaria-quickguide/' },
+      { label: 'Barbara · KQM', url: 'https://keqingmains.com/q/barbara-quickguide/' },
+      { label: 'Sucrose · KQM', url: 'https://keqingmains.com/q/sucrose-quickguide/' },
+    ],
+    slots: [
+      { characterId: 'kaeya', role: 'Dano e bateria Cryo', alternatives: [{ characterId: 'rosaria', reason: 'mantém dano Cryo e também gera partículas' }] },
+      { characterId: 'rosaria', role: 'Dano e suporte Cryo', alternatives: [{ characterId: 'diona', reason: 'mantém Cryo e adiciona escudo e cura' }] },
+      { characterId: 'barbara', role: 'Aplicação Hydro e cura', alternatives: [{ characterId: 'xingqiu', reason: 'aplica Hydro com consistência, mas a equipe perde a cura de Barbara' }] },
+      { characterId: 'sucrose', role: 'Agrupamento e redução de RES', alternatives: [{ characterId: 'traveler', reason: 'oferece suporte Anemo e pode usar Sombra Verde' }, { characterId: 'lynette', reason: 'oferece suporte Anemo e pode usar Sombra Verde' }] },
+    ],
+  },
+  {
+    id: 'lisa-aggravate', title: 'Agravamento da Lisa', subtitle: 'Equipe de quatro estrelas focada em Quicken e Aggravate', difficulty: 'Intermediário', priority: 5, tags: ['Agravamento', 'Quicken', '4 estrelas'],
+    explanation: 'Collei mantém a aura Dendro; Lisa ativa Aggravate em campo, Fischl causa dano Electro fora de campo e ajuda com energia, e Sucrose oferece redução de RES e Proficiência Elemental. Yaoyao pode substituir Collei para trazer cura, com aplicação Dendro diferente.',
+    sources: [
+      { label: 'Lisa · KQM', url: 'https://keqingmains.com/q/lisa-quickguide/' },
+      { label: 'Collei · KQM', url: 'https://keqingmains.com/q/collei-quickguide/' },
+      { label: 'Sucrose · KQM', url: 'https://keqingmains.com/q/sucrose-quickguide/' },
+    ],
+    slots: [
+      { characterId: 'lisa', role: 'DPS Electro em campo', alternatives: [] },
+      { characterId: 'fischl', role: 'Dano Electro fora de campo', alternatives: [{ characterId: 'beidou', reason: 'adiciona dano Electro em área, mas oferece menos bateria à Lisa' }] },
+      { characterId: 'collei', role: 'Aplicação Dendro', alternatives: [{ characterId: 'yaoyao', reason: 'mantém Dendro e adiciona cura' }] },
+      { characterId: 'sucrose', role: 'Suporte Anemo e redução de RES', alternatives: [{ characterId: 'traveler', reason: 'oferece suporte Anemo e pode usar Sombra Verde' }, { characterId: 'lynette', reason: 'oferece suporte Anemo e pode usar Sombra Verde' }] },
+    ],
+  },
 ];
 
 export const elementNames = { Pyro: 'Pyro', Hydro: 'Hydro', Anemo: 'Anemo', Electro: 'Electro', Cryo: 'Cryo', Geo: 'Geo', Dendro: 'Dendro' };

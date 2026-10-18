@@ -11,6 +11,16 @@ const WEAPON_STORAGE_KEY = 'teyvat-compass-weapons-v1';
 const ENKA_SHOWCASE_STORAGE_KEY = 'teyvat-compass-showcase-v1';
 const GOALS_STORAGE_KEY = 'teyvat-compass-goals-v1';
 const LOCAL_PROFILE_OWNER_KEY = 'teyvat-compass-profile-owner-v1';
+const TEAM_SLOT_PREFERENCES_STORAGE_KEY = 'teyvat-compass-team-slot-preferences-v1';
+const teamSlotPreferencesStorageKey = (ownerId = 'local') => `${TEAM_SLOT_PREFERENCES_STORAGE_KEY}:${ownerId}`;
+const readTeamSlotPreferences = (ownerId = 'local') => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(teamSlotPreferencesStorageKey(ownerId)));
+    return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
+  } catch {
+    return {};
+  }
+};
 const readRoster = () => {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -166,7 +176,7 @@ function AccountMenu({ session, profileStatus, profileFeedback }) {
   );
 }
 
-function TeamCard({ team, roster, evaluation, focusCharacterId, onEditRoster, onOpenTeamBuilds }) {
+function TeamCard({ team, roster, evaluation, focusCharacterId, isCustomized, onEditRoster, onOpenTeamBuilds }) {
   const complete = evaluation.coveredCount === team.slots.length;
   const missingSlots = team.slots.filter((slot, index) => !evaluation.lineup[index]);
   const assignedIds = new Set(evaluation.lineup.filter(Boolean).map((selection) => selection.characterId));
@@ -189,6 +199,7 @@ function TeamCard({ team, roster, evaluation, focusCharacterId, onEditRoster, on
       <div className="team-title-row"><h3>{team.title}</h3><span className="team-arrow">↗</span></div>
       <p className="team-subtitle">{team.subtitle}</p>
       {focusCharacterId && <p className="team-focus-label">✦ Time recomendado com {getCharacter(focusCharacterId)?.name} no elenco</p>}
+      {isCustomized && <p className="team-customized-label">✦ Formação personalizada</p>}
       <div className="team-tags">{team.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
       <div className="team-lineup">
         {team.slots.map((slot, index) => {
@@ -200,6 +211,7 @@ function TeamCard({ team, roster, evaluation, focusCharacterId, onEditRoster, on
               <span className="slot-name">{character?.name || getCharacter(slot.characterId)?.name}</span>
               <span className="slot-role">{slot.role}</span>
               {selection?.kind === 'alternative' && <span className="slot-note">substitui {getCharacter(slot.characterId)?.name}</span>}
+              {selection?.kind === 'custom' && <span className="slot-note">escolha manual · revise a sinergia</span>}
               {!selection && roster.length > 0 && <span className="slot-note slot-note--missing">posição em falta</span>}
               {index < team.slots.length - 1 && <span className="lineup-plus">+</span>}
             </div>
@@ -216,6 +228,8 @@ function TeamCard({ team, roster, evaluation, focusCharacterId, onEditRoster, on
           {evaluation.lineup.some((selection) => selection?.kind === 'alternative') && <ul className="swap-reasons">
             {evaluation.lineup.filter((selection) => selection?.kind === 'alternative').map((selection) => <li key={`${team.id}-${selection.characterId}`}><b>{selection.character.name}</b> no lugar de <b>{getCharacter(selection.slot.characterId)?.name}</b>: {selection.reason}.</li>)}
           </ul>}
+          {evaluation.lineup.some((selection) => selection?.kind === 'custom') && <p className="missing-options">As escolhas manuais não têm compatibilidade de função ou sinergia avaliadas pelo Compass; confira se o personagem atende ao papel desta posição.</p>}
+          {team.sources?.length > 0 && <p className="team-source-links">Guias consultados: {team.sources.map((source, index) => <span key={source.url}>{index > 0 && ' · '}<a href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a></span>)}</p>}
           {missingSlots.length > 0 && roster.length > 0 && <p className="missing-options">Para completar: {missingSlots.map((slot) => {
             const options = slot.alternatives
               .filter((option) => !assignedIds.has(option.characterId))
@@ -233,7 +247,7 @@ function TeamCard({ team, roster, evaluation, focusCharacterId, onEditRoster, on
   );
 }
 
-function TeamBuildWorkspace({ team, evaluation, selectedCharacterId, onSelectCharacter, onBack, ownedWeapons, goals, onToggleWeapon, onAddBuildGoal, onOpenBuilds }) {
+function TeamBuildWorkspace({ team, roster, evaluation, slotPreferences, selectedCharacterId, onSelectCharacter, onSetSlotPreference, onResetSlotPreferences, onBack, ownedWeapons, goals, onToggleWeapon, onAddBuildGoal, onOpenBuilds }) {
   const members = team.slots.map((slot, index) => ({
     slot,
     selection: evaluation.lineup[index],
@@ -252,19 +266,43 @@ function TeamBuildWorkspace({ team, evaluation, selectedCharacterId, onSelectCha
       <p>{team.subtitle}</p>
       <div className="team-build-context">{team.tags.map((tag) => <span key={tag}>{tag}</span>)}<span>{evaluation.coveredCount}/{team.slots.length} integrantes no seu elenco</span></div>
       {members.some(({ selection }) => selection?.kind === 'alternative') && <p className="team-build-alternatives">{members.filter(({ selection }) => selection?.kind === 'alternative').map(({ character, slot }) => `${character.name} substitui ${getCharacter(slot.characterId)?.name}`).join(' · ')}</p>}
+      {members.some(({ selection }) => selection?.kind === 'custom') && <p className="team-build-alternatives">Escolhas manuais: {members.filter(({ selection }) => selection?.kind === 'custom').map(({ character, slot }) => `${character.name} em ${slot.role}`).join(' · ')}. Compatibilidade de função e sinergia não avaliadas.</p>}
+      {Object.keys(slotPreferences).length > 0 && <button type="button" className="team-build-reset" onClick={() => onResetSlotPreferences(team.id)}>Restaurar sugestões automáticas</button>}
     </div>
     <div className="team-build-workspace-layout">
       <nav className="team-build-member-list" aria-label={`Integrantes de ${team.title}`}>
         <h4>Escolha um integrante</h4>
-        {members.map(({ slot, selection, character }) => {
+        {members.map(({ slot, selection, character }, index) => {
           const hasGuide = Boolean(character && builds[character.id]);
           const isSelected = selectedCharacter?.id === character?.id;
           const isOwned = Boolean(selection);
-          return <button key={slot.characterId} type="button" aria-pressed={isSelected} className={`team-build-member${isSelected ? ' is-selected' : ''}${!hasGuide ? ' has-no-guide' : ''}`} onClick={() => character && onSelectCharacter(team.id, character.id)} disabled={!character}>
-            {character && <span className="team-build-avatar" style={{ '--character-color': character.color }}>{character.initials}</span>}
-            <span className="team-build-member-copy"><strong>{character?.name || 'Posição vaga'}</strong><small>{slot.role}{selection?.kind === 'alternative' ? ` · substitui ${getCharacter(slot.characterId)?.name}` : ''}</small><small>{!isOwned ? 'Sugestão fora do seu elenco' : hasGuide ? 'Guia disponível' : 'Guia ainda não cadastrado'}</small></span>
-            <b aria-hidden="true">{isSelected ? '›' : ''}</b>
-          </button>;
+          const usedByOtherSlots = new Set(evaluation.lineup.filter((other, otherIndex) => otherIndex !== index && other).map((other) => other.characterId));
+          const curatedOptions = [
+            { characterId: slot.characterId, kind: 'main' },
+            ...slot.alternatives.map((option) => ({ ...option, kind: 'alternative' })),
+          ].filter((option, optionIndex, options) => roster.includes(option.characterId)
+            && !usedByOtherSlots.has(option.characterId)
+            && options.findIndex((candidate) => candidate.characterId === option.characterId) === optionIndex);
+          const curatedIds = new Set(curatedOptions.map((option) => option.characterId));
+          const otherRosterOptions = roster
+            .filter((characterId) => !curatedIds.has(characterId) && !usedByOtherSlots.has(characterId))
+            .map((characterId) => ({ characterId, kind: 'custom' }));
+          return <div className="team-build-member-entry" key={slot.characterId}>
+            <button type="button" aria-pressed={isSelected} className={`team-build-member${isSelected ? ' is-selected' : ''}${!hasGuide ? ' has-no-guide' : ''}`} onClick={() => character && onSelectCharacter(team.id, character.id)} disabled={!character}>
+              {character && <span className="team-build-avatar" style={{ '--character-color': character.color }}>{character.initials}</span>}
+              <span className="team-build-member-copy"><strong>{character?.name || 'Posição vaga'}</strong><small>{slot.role}{selection?.kind === 'alternative' ? ` · substitui ${getCharacter(slot.characterId)?.name}` : selection?.kind === 'custom' ? ' · escolha manual' : ''}</small><small>{!isOwned ? 'Sugestão fora do seu elenco' : hasGuide ? 'Guia disponível' : 'Guia ainda não cadastrado'}</small></span>
+              <b aria-hidden="true">{isSelected ? '›' : ''}</b>
+            </button>
+            <label className="team-slot-choice"><span>Personagem nesta posição</span><select aria-label={`Escolher personagem para ${slot.role}`} value={slotPreferences[index] || ''} onChange={(event) => onSetSlotPreference(team.id, index, event.target.value)}>
+              <option value="">Automática · melhor encaixe</option>
+              <optgroup label="Sugestões avaliadas">
+                {curatedOptions.map((option) => <option key={option.characterId} value={option.characterId}>{getCharacter(option.characterId)?.name}{option.reason ? ` · ${option.reason}` : ''}</option>)}
+              </optgroup>
+              {otherRosterOptions.length > 0 && <optgroup label="Outros personagens do elenco — escolha manual">
+                {otherRosterOptions.map((option) => <option key={option.characterId} value={option.characterId}>{getCharacter(option.characterId)?.name}</option>)}
+              </optgroup>}
+            </select></label>
+          </div>;
         })}
       </nav>
       <div className="team-build-detail">
@@ -487,10 +525,13 @@ export default function App() {
   const [selectedShowcaseCharacterId, setSelectedShowcaseCharacterId] = useState(null);
   const [teamFocusCharacterId, setTeamFocusCharacterId] = useState('');
   const [selectedTeamBuildCharacters, setSelectedTeamBuildCharacters] = useState({});
+  const [teamSlotPreferences, setTeamSlotPreferences] = useState({});
+  const [teamSlotPreferencesOwnerId, setTeamSlotPreferencesOwnerId] = useState(null);
   const [selectedBuildTeamId, setSelectedBuildTeamId] = useState('');
   const [session, setSession] = useState(null);
   const [loadedProfileUserId, setLoadedProfileUserId] = useState(null);
   const [cloudGoalsAvailable, setCloudGoalsAvailable] = useState(true);
+  const [cloudTeamPreferencesAvailable, setCloudTeamPreferencesAvailable] = useState(true);
   const [localProfileReady, setLocalProfileReady] = useState(!supabase);
   const [profileStatus, setProfileStatus] = useState('local');
   const [profileFeedback, setProfileFeedback] = useState('');
@@ -523,6 +564,22 @@ export default function App() {
   const materialCharacters = useMemo(() => roster.map(getCharacter).filter((character) => character?.avatarId), [roster]);
   const selectedMaterialCharacter = materialCharacters.find((character) => character.id === materialCharacterId) || materialCharacters[0];
   const selectedMaterialName = materialPlanType === 'weapon' ? selectedMaterialWeapon : selectedMaterialCharacter?.name;
+
+  const preferenceStorageOwnerId = session?.user?.id || 'local';
+
+  useEffect(() => {
+    setTeamSlotPreferences(readTeamSlotPreferences(preferenceStorageOwnerId));
+    setTeamSlotPreferencesOwnerId(preferenceStorageOwnerId);
+  }, [preferenceStorageOwnerId]);
+
+  useEffect(() => {
+    if (teamSlotPreferencesOwnerId !== preferenceStorageOwnerId) return;
+    try {
+      localStorage.setItem(teamSlotPreferencesStorageKey(preferenceStorageOwnerId), JSON.stringify(teamSlotPreferences));
+    } catch {
+      // Preferências continuam ativas na sessão se o navegador bloquear o armazenamento.
+    }
+  }, [teamSlotPreferences, teamSlotPreferencesOwnerId, preferenceStorageOwnerId]);
 
   useEffect(() => {
     const syncPageFromHash = () => setActiveNav(pageFromHash(window.location.hash));
@@ -600,6 +657,7 @@ export default function App() {
       setLocalProfileReady(true);
       setProfileStatus('local');
       setProfileFeedback('');
+      setCloudTeamPreferencesAvailable(false);
       const hasSignedInLocalProfile = supabase && localStorage.getItem(LOCAL_PROFILE_OWNER_KEY);
       if (hasSignedInLocalProfile) {
         setRoster([]);
@@ -619,6 +677,7 @@ export default function App() {
     setLocalProfileReady(false);
     setLoadedProfileUserId(null);
     setCloudGoalsAvailable(false);
+    setCloudTeamPreferencesAvailable(false);
     setProfileStatus('loading');
     setProfileFeedback('');
 
@@ -650,16 +709,33 @@ export default function App() {
       const supportsCloudGoals = !goalsError;
       setCloudGoalsAvailable(supportsCloudGoals);
 
+      const { data: teamPreferencesData, error: teamPreferencesError } = await supabase
+        .from('player_profiles')
+        .select('team_slot_preferences')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (!active) return;
+      const supportsCloudTeamPreferences = !teamPreferencesError;
+      setCloudTeamPreferencesAvailable(supportsCloudTeamPreferences);
+
       const localOwnerId = localStorage.getItem(LOCAL_PROFILE_OWNER_KEY);
       const canImportLocal = !localOwnerId || localOwnerId === userId;
       const nextRoster = Array.isArray(data?.roster) ? data.roster : canImportLocal ? readRoster() : [];
       const nextWeapons = Array.isArray(data?.owned_weapons) ? data.owned_weapons : canImportLocal ? readOwnedWeapons() : [];
       const nextShowcase = data?.enka_showcase?.avatars ? data.enka_showcase : canImportLocal ? readEnkaShowcase() : null;
       const nextGoals = Array.isArray(goalsData?.goals) ? goalsData.goals : canImportLocal ? readGoals() : [];
+      const cloudTeamPreferences = teamPreferencesData?.team_slot_preferences;
+      const hasCloudTeamPreferences = cloudTeamPreferences && typeof cloudTeamPreferences === 'object' && !Array.isArray(cloudTeamPreferences);
+      const localPreferencesOwnerId = localOwnerId === userId ? userId : 'local';
+      const nextTeamPreferences = hasCloudTeamPreferences
+        ? cloudTeamPreferences
+        : canImportLocal ? readTeamSlotPreferences(localPreferencesOwnerId) : readTeamSlotPreferences(userId);
       setRoster(nextRoster);
       setOwnedWeapons(nextWeapons);
       setEnkaShowcase(nextShowcase);
       setGoals(nextGoals);
+      setTeamSlotPreferences(nextTeamPreferences);
+      setTeamSlotPreferencesOwnerId(userId);
 
       if (!data) {
         setProfileStatus('migrating');
@@ -669,6 +745,7 @@ export default function App() {
           owned_weapons: nextWeapons,
           enka_showcase: nextShowcase || {},
           ...(supportsCloudGoals ? { goals: nextGoals } : {}),
+          ...(supportsCloudTeamPreferences ? { team_slot_preferences: nextTeamPreferences } : {}),
           updated_at: new Date().toISOString(),
         }, { onConflict: 'user_id' });
         if (!active) return;
@@ -680,7 +757,13 @@ export default function App() {
       }
       setLoadedProfileUserId(userId);
       setProfileStatus('synced');
-      setProfileFeedback(supportsCloudGoals ? '' : 'Perfil carregado. Para sincronizar objetivos na nuvem, execute o schema.sql atualizado no Supabase. Seus objetivos continuam salvos neste navegador.');
+      const localOnlyFeatures = [
+        !supportsCloudGoals && 'objetivos',
+        !supportsCloudTeamPreferences && 'formações personalizadas',
+      ].filter(Boolean);
+      setProfileFeedback(localOnlyFeatures.length
+        ? `Perfil carregado. Para sincronizar ${localOnlyFeatures.join(' e ')} na nuvem, execute o schema.sql atualizado no Supabase. Esses dados continuam salvos neste navegador.`
+        : '');
     };
 
     loadProfile().catch(() => {
@@ -702,6 +785,7 @@ export default function App() {
         if (enkaShowcase) localStorage.setItem(ENKA_SHOWCASE_STORAGE_KEY, JSON.stringify(enkaShowcase));
         else localStorage.removeItem(ENKA_SHOWCASE_STORAGE_KEY);
         localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goals));
+        localStorage.setItem(teamSlotPreferencesStorageKey(userId), JSON.stringify(teamSlotPreferences));
         localStorage.setItem(LOCAL_PROFILE_OWNER_KEY, userId);
       } catch {
         // A cloud save should still work if browser storage is unavailable.
@@ -714,17 +798,24 @@ export default function App() {
         updated_at: new Date().toISOString(),
       };
       if (cloudGoalsAvailable) profileUpdate.goals = goals;
+      if (cloudTeamPreferencesAvailable) profileUpdate.team_slot_preferences = teamSlotPreferences;
       const { error } = await supabase.from('player_profiles').upsert(profileUpdate, { onConflict: 'user_id' });
       if (error) {
         setProfileStatus('error');
         setProfileFeedback('Não foi possível sincronizar agora. Seus dados continuam guardados neste navegador.');
       } else {
         setProfileStatus('synced');
-        setProfileFeedback(cloudGoalsAvailable ? '' : 'Elenco sincronizado. Os objetivos ficam neste navegador até executar o schema.sql atualizado no Supabase.');
+        const localOnlyFeatures = [
+          !cloudGoalsAvailable && 'objetivos',
+          !cloudTeamPreferencesAvailable && 'formações personalizadas',
+        ].filter(Boolean);
+        setProfileFeedback(localOnlyFeatures.length
+          ? `Elenco sincronizado. ${localOnlyFeatures.join(' e ')} ficam neste navegador até executar o schema.sql atualizado no Supabase.`
+          : '');
       }
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [roster, ownedWeapons, enkaShowcase, goals, cloudGoalsAvailable, session?.user?.id, loadedProfileUserId]);
+  }, [roster, ownedWeapons, enkaShowcase, goals, teamSlotPreferences, cloudGoalsAvailable, cloudTeamPreferencesAvailable, session?.user?.id, loadedProfileUserId]);
 
   useEffect(() => {
     if (!localProfileReady || (supabase && session?.user?.id)) return;
@@ -809,6 +900,26 @@ export default function App() {
 
   const selectTeamBuildCharacter = (teamId, characterId) => {
     setSelectedTeamBuildCharacters((current) => ({ ...current, [teamId]: characterId }));
+  };
+
+  const setTeamSlotPreference = (teamId, slotIndex, characterId) => {
+    setTeamSlotPreferences((current) => {
+      const nextForTeam = { ...(current[teamId] || {}) };
+      if (characterId) nextForTeam[slotIndex] = characterId;
+      else delete nextForTeam[slotIndex];
+      const next = { ...current };
+      if (Object.keys(nextForTeam).length) next[teamId] = nextForTeam;
+      else delete next[teamId];
+      return next;
+    });
+  };
+
+  const resetTeamSlotPreferences = (teamId) => {
+    setTeamSlotPreferences((current) => {
+      const next = { ...current };
+      delete next[teamId];
+      return next;
+    });
   };
 
   const openTeamBuilds = (teamId) => {
@@ -962,11 +1073,9 @@ export default function App() {
     { label: 'Meu plano', icon: '⌂', target: 'home' },
     { label: 'Personagens', icon: '✧', target: 'characters' },
     { label: 'Builds', icon: '⚒', target: 'builds' },
-    { label: 'Mapa', icon: '⌖', target: 'map-preview', soon: true },
   ];
 
   const goTo = (item) => {
-    if (item.soon) return;
     setActiveNav(item.label);
     if (window.location.hash !== `#${item.target}`) window.history.pushState(null, '', `#${item.target}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1001,7 +1110,7 @@ export default function App() {
         <a className="brand" href="#home" onClick={() => goTo(navItems[0])}><CompassMark /><span><strong>TEYVAT</strong><small>COMPASS</small></span></a>
         <div className="sidebar-label">SUA JORNADA</div>
         <nav className="main-nav" aria-label="Navegação principal">
-          {navItems.map((item) => <button key={item.label} type="button" disabled={item.soon} aria-current={activeNav === item.label ? 'page' : undefined} className={activeNav === item.label ? 'active' : ''} onClick={() => goTo(item)}><span className="nav-icon">{item.icon}</span>{item.label}{item.soon && <span className="soon-tag">EM BREVE</span>}</button>)}
+          {navItems.map((item) => <button key={item.label} type="button" aria-current={activeNav === item.label ? 'page' : undefined} className={activeNav === item.label ? 'active' : ''} onClick={() => goTo(item)}><span className="nav-icon">{item.icon}</span>{item.label}</button>)}
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-orbit" aria-hidden="true"><span>✦</span><i /><b /></div>
@@ -1049,9 +1158,13 @@ export default function App() {
             const selected = rankedTeams.find(({ team }) => team.id === selectedBuildTeamId);
             return selected && <TeamBuildWorkspace
               team={selected.team}
-              evaluation={selected.evaluation}
+              roster={roster}
+              evaluation={evaluateTeam(selected.team, roster, teamFocusCharacterId, teamSlotPreferences[selected.team.id])}
+              slotPreferences={teamSlotPreferences[selected.team.id] || {}}
               selectedCharacterId={selectedTeamBuildCharacters[selected.team.id]}
               onSelectCharacter={selectTeamBuildCharacter}
+              onSetSlotPreference={setTeamSlotPreference}
+              onResetSlotPreferences={resetTeamSlotPreferences}
               onBack={() => { setSelectedBuildTeamId(''); window.setTimeout(() => document.getElementById('recommendations')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0); }}
               ownedWeapons={ownedWeapons}
               goals={goals}
@@ -1060,7 +1173,7 @@ export default function App() {
               onOpenBuilds={() => goTo(navItems[2])}
             />;
           })() : rankedTeams.length > 0
-            ? <div className="team-grid">{rankedTeams.map(({ team, evaluation }) => <TeamCard key={team.id} team={team} roster={roster} evaluation={evaluation} focusCharacterId={teamFocusCharacterId} onEditRoster={() => goTo(navItems[1])} onOpenTeamBuilds={openTeamBuilds} />)}</div>
+            ? <div className="team-grid">{rankedTeams.map(({ team, evaluation }) => <TeamCard key={team.id} team={team} roster={roster} evaluation={teamSlotPreferences[team.id] ? evaluateTeam(team, roster, teamFocusCharacterId, teamSlotPreferences[team.id]) : evaluation} focusCharacterId={teamFocusCharacterId} isCustomized={Boolean(teamSlotPreferences[team.id] && Object.keys(teamSlotPreferences[team.id]).length)} onEditRoster={() => goTo(navItems[1])} onOpenTeamBuilds={openTeamBuilds} />)}</div>
             : <div className="empty-state team-focus-empty"><strong>Ainda não há um time cadastrado com {getCharacter(teamFocusCharacterId)?.name}.</strong><p>Os guias atuais cobrem algumas composições iniciais. Limpe o foco para ver todos os times ou escolha outro personagem do elenco.</p><button type="button" onClick={() => setTeamFocusCharacterId('')}>Ver todos os times</button></div>}
           <div className="data-note"><span>ⓘ</span> Builds são uma curadoria inicial baseada nos guias KQM; confirme requisitos de Recarga e ajuste à sua equipe. Algumas trocas alteram a rotação ou o desempenho.</div>
         </section></>}

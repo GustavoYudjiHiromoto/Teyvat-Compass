@@ -2,7 +2,7 @@ import { characters } from './data.js';
 
 const getCharacter = (id) => characters.find((character) => character.id === id);
 
-export function evaluateTeam(team, roster, focusCharacterId = null) {
+export function evaluateTeam(team, roster, focusCharacterId = null, slotPreferences = {}) {
   let best = { lineup: [], coveredCount: -1, coreCount: -1, includesFocus: false };
 
   function chooseSlot(index, usedIds, lineup, coveredCount, coreCount) {
@@ -23,10 +23,15 @@ export function evaluateTeam(team, roster, focusCharacterId = null) {
     }
 
     const slot = team.slots[index];
-    const options = [
+    const slotOptions = [
       { characterId: slot.characterId, kind: 'main' },
       ...slot.alternatives.map((alternative) => ({ ...alternative, kind: 'alternative' })),
     ];
+    const preference = slotPreferences[index];
+    const selectedOption = slotOptions.find((option) => option.characterId === preference);
+    const options = preference
+      ? [selectedOption || { characterId: preference, kind: 'custom', reason: 'Escolha manual; compatibilidade não avaliada' }]
+      : slotOptions;
 
     for (const option of options) {
       if (!roster.includes(option.characterId) || usedIds.has(option.characterId)) continue;
