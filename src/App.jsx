@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { characters, teams } from './data.js';
-import { evaluateTeam } from './recommendations.js';
+import { evaluateTeam, getTeamReactionOpportunities } from './recommendations.js';
 import { builds, buildSourceName } from './builds.js';
 import { isSupabaseConfigured, supabase } from './lib/supabase.js';
 import { enkaAvatarToCharacter, getEnkaCache, saveEnkaCache } from './enka.js';
@@ -70,6 +70,9 @@ function MaterialItemIcon({ item }) {
     : <span className="material-item-icon"><img src={item.imageUrl} alt="" loading="lazy" onError={() => setFailed(true)} /></span>;
 }
 
+const elementSymbols = { Anemo: '〰', Cryo: '❄', Dendro: '❋', Electro: 'ϟ', Geo: '⬡', Hydro: '◌', Pyro: '♨' };
+const elementIconUrl = (element) => `https://paimon.moe/images/elements/${element?.toLocaleLowerCase('en-US')}.png`;
+
 function CharacterToken({ character, compact = false }) {
   if (!character) {
     return <div className={`character-token character-token--missing${compact ? ' character-token--compact' : ''}`} aria-label="Posição vaga"><span className="token-initials">?</span></div>;
@@ -82,8 +85,11 @@ function CharacterToken({ character, compact = false }) {
       title={`${character.name} · ${character.element}`}
       aria-label={character.name}
     >
-      <span className="token-initials">{character.initials}</span>
-      <span className="token-element">{character.element === 'Electro' ? 'ϟ' : character.element === 'Pyro' ? '♨' : character.element === 'Hydro' ? '◌' : character.element === 'Cryo' ? '❄' : character.element === 'Anemo' ? '〰' : '◇'}</span>
+      {character.iconUrl ? <><img className="token-portrait" src={character.iconUrl} alt="" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.nextElementSibling.hidden = false; }} /><span className="token-initials" hidden>{character.initials}</span></> : <span className="token-initials">{character.initials}</span>}
+      <span className="token-element" title={character.element}>
+        <img src={elementIconUrl(character.element)} alt={character.element} loading="lazy" onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.nextElementSibling.hidden = false; }} />
+        <span hidden aria-hidden="true">{elementSymbols[character.element] || '◇'}</span>
+      </span>
     </div>
   );
 }
@@ -228,7 +234,7 @@ function TeamCard({ team, roster, evaluation, focusCharacterId, isCustomized, on
           {evaluation.lineup.some((selection) => selection?.kind === 'alternative') && <ul className="swap-reasons">
             {evaluation.lineup.filter((selection) => selection?.kind === 'alternative').map((selection) => <li key={`${team.id}-${selection.characterId}`}><b>{selection.character.name}</b> no lugar de <b>{getCharacter(selection.slot.characterId)?.name}</b>: {selection.reason}.</li>)}
           </ul>}
-          {evaluation.lineup.some((selection) => selection?.kind === 'custom') && <p className="missing-options">As escolhas manuais não têm compatibilidade de função ou sinergia avaliadas pelo Compass; confira se o personagem atende ao papel desta posição.</p>}
+          {evaluation.lineup.some((selection) => selection?.kind === 'custom') && <p className="missing-options">O Compass não avalia a função do personagem na posição. As combinações elementais aparecem nas builds como possibilidades, sem análise de rotação.</p>}
           {team.sources?.length > 0 && <p className="team-source-links">Guias consultados: {team.sources.map((source, index) => <span key={source.url}>{index > 0 && ' · '}<a href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a></span>)}</p>}
           {missingSlots.length > 0 && roster.length > 0 && <p className="missing-options">Para completar: {missingSlots.map((slot) => {
             const options = slot.alternatives
@@ -257,6 +263,7 @@ function TeamBuildWorkspace({ team, roster, evaluation, slotPreferences, selecte
     || members.find(({ character }) => character && builds[character.id])
     || members.find(({ character }) => character);
   const selectedCharacter = selectedMember?.character;
+  const reactionOpportunities = getTeamReactionOpportunities(evaluation.lineup);
 
   return <section className="team-build-workspace" id="team-build-workspace" aria-labelledby="team-build-workspace-title">
     <div className="team-build-workspace-heading">
@@ -266,7 +273,14 @@ function TeamBuildWorkspace({ team, roster, evaluation, slotPreferences, selecte
       <p>{team.subtitle}</p>
       <div className="team-build-context">{team.tags.map((tag) => <span key={tag}>{tag}</span>)}<span>{evaluation.coveredCount}/{team.slots.length} integrantes no seu elenco</span></div>
       {members.some(({ selection }) => selection?.kind === 'alternative') && <p className="team-build-alternatives">{members.filter(({ selection }) => selection?.kind === 'alternative').map(({ character, slot }) => `${character.name} substitui ${getCharacter(slot.characterId)?.name}`).join(' · ')}</p>}
-      {members.some(({ selection }) => selection?.kind === 'custom') && <p className="team-build-alternatives">Escolhas manuais: {members.filter(({ selection }) => selection?.kind === 'custom').map(({ character, slot }) => `${character.name} em ${slot.role}`).join(' · ')}. Compatibilidade de função e sinergia não avaliadas.</p>}
+      {members.some(({ selection }) => selection?.kind === 'custom') && <p className="team-build-alternatives">Escolhas manuais: {members.filter(({ selection }) => selection?.kind === 'custom').map(({ character, slot }) => `${character.name} em ${slot.role}`).join(' · ')}. A função na posição e a rotação não são avaliadas.</p>}
+      <div className="team-reaction-summary" aria-live="polite">
+        <strong>Combinações elementais possíveis</strong>
+        {reactionOpportunities.length > 0
+          ? <div className="team-reaction-list">{reactionOpportunities.map((reaction) => <span key={reaction}>{reaction}</span>)}</div>
+          : <p>Com os integrantes atuais, nenhuma combinação da lista foi identificada.</p>}
+        <small>Lista resumida baseada apenas nos elementos. Indica possibilidades; não verifica aplicação, rotação, função ou consistência em combate.</small>
+      </div>
       {Object.keys(slotPreferences).length > 0 && <button type="button" className="team-build-reset" onClick={() => onResetSlotPreferences(team.id)}>Restaurar sugestões automáticas</button>}
     </div>
     <div className="team-build-workspace-layout">
@@ -289,7 +303,13 @@ function TeamBuildWorkspace({ team, roster, evaluation, slotPreferences, selecte
             .map((characterId) => ({ characterId, kind: 'custom' }));
           return <div className="team-build-member-entry" key={slot.characterId}>
             <button type="button" aria-pressed={isSelected} className={`team-build-member${isSelected ? ' is-selected' : ''}${!hasGuide ? ' has-no-guide' : ''}`} onClick={() => character && onSelectCharacter(team.id, character.id)} disabled={!character}>
-              {character && <span className="team-build-avatar" style={{ '--character-color': character.color }}>{character.initials}</span>}
+              {character && <span className="team-build-avatar" style={{ '--character-color': character.color }} title={`${character.name} · ${character.element}`}>
+                {character.iconUrl ? <><img src={character.iconUrl} alt="" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.nextElementSibling.hidden = false; }} /><span className="team-build-avatar-fallback" hidden>{character.initials}</span></> : <span className="team-build-avatar-fallback">{character.initials}</span>}
+                <span className="team-build-element" title={character.element}>
+                  <img src={elementIconUrl(character.element)} alt={character.element} loading="lazy" onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.nextElementSibling.hidden = false; }} />
+                  <span hidden aria-hidden="true">{elementSymbols[character.element] || '◇'}</span>
+                </span>
+              </span>}
               <span className="team-build-member-copy"><strong>{character?.name || 'Posição vaga'}</strong><small>{slot.role}{selection?.kind === 'alternative' ? ` · substitui ${getCharacter(slot.characterId)?.name}` : selection?.kind === 'custom' ? ' · escolha manual' : ''}</small><small>{!isOwned ? 'Sugestão fora do seu elenco' : hasGuide ? 'Guia disponível' : 'Guia ainda não cadastrado'}</small></span>
               <b aria-hidden="true">{isSelected ? '›' : ''}</b>
             </button>

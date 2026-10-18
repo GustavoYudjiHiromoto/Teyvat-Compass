@@ -2,6 +2,33 @@ import { characters } from './data.js';
 
 const getCharacter = (id) => characters.find((character) => character.id === id);
 
+const reactionRules = [
+  { elements: ['Pyro', 'Hydro'], name: 'Vaporização' },
+  { elements: ['Pyro', 'Cryo'], name: 'Fusão' },
+  { elements: ['Hydro', 'Cryo'], name: 'Congelamento' },
+  { elements: ['Electro', 'Hydro'], name: 'Eletrocarregado' },
+  { elements: ['Electro', 'Cryo'], name: 'Supercondutor' },
+  { elements: ['Electro', 'Pyro'], name: 'Sobrecarga' },
+  { elements: ['Dendro', 'Electro'], name: 'Aceleração (Quicken)' },
+  { elements: ['Dendro', 'Hydro'], name: 'Florescimento' },
+  { elements: ['Dendro', 'Pyro'], name: 'Queimadura' },
+];
+
+export function getTeamReactionOpportunities(lineup) {
+  const elements = new Set(lineup.filter(Boolean).map(({ character }) => character?.element).filter(Boolean));
+  const reactions = reactionRules
+    .filter(({ elements: pair }) => pair.every((element) => elements.has(element)))
+    .map(({ name }) => name);
+
+  if (elements.has('Dendro') && elements.has('Hydro') && elements.has('Electro')) reactions.push('Hiperflorescimento (Electro nos núcleos)');
+  if (elements.has('Dendro') && elements.has('Hydro') && elements.has('Pyro')) reactions.push('Burgeon (Pyro nos núcleos)');
+  if (elements.has('Dendro') && elements.has('Electro')) reactions.push('Agravamento / Propagação (ataques na aura Quicken)');
+  if (elements.has('Anemo') && ['Pyro', 'Hydro', 'Electro', 'Cryo'].some((element) => elements.has(element))) reactions.push('Redemoinho');
+  if (elements.has('Geo') && ['Pyro', 'Hydro', 'Electro', 'Cryo'].some((element) => elements.has(element))) reactions.push('Cristalização');
+
+  return reactions;
+}
+
 export function evaluateTeam(team, roster, focusCharacterId = null, slotPreferences = {}) {
   let best = { lineup: [], coveredCount: -1, coreCount: -1, includesFocus: false };
 
