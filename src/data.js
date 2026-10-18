@@ -1,4 +1,6 @@
-export const characters = [
+import characterCatalog from './characterCatalog.json';
+
+const curatedCharacters = [
   { id: 'traveler', name: 'Viajante', element: 'Anemo', rarity: 5, weapon: 'Espada', role: 'Suporte', color: '#d9c68b', initials: 'VJ' },
   { id: 'xiangling', name: 'Xiangling', element: 'Pyro', rarity: 4, weapon: 'Lança', role: 'Sub DPS', color: '#ed866f', initials: 'XL' },
   { id: 'xingqiu', name: 'Xingqiu', element: 'Hydro', rarity: 4, weapon: 'Espada', role: 'Sub DPS', color: '#74bbd3', initials: 'XQ' },
@@ -18,6 +20,28 @@ export const characters = [
   { id: 'yaoyao', name: 'Yaoyao', element: 'Dendro', rarity: 4, weapon: 'Lança', role: 'Healer', color: '#9bbd8c', initials: 'YY' },
   { id: 'diona', name: 'Diona', element: 'Cryo', rarity: 4, weapon: 'Arco', role: 'Healer', color: '#c999ab', initials: 'DI' },
 ];
+
+const curatedById = new Map(curatedCharacters.map((character) => [character.id, character]));
+const elementColors = {
+  Anemo: '#a5c58c', Cryo: '#83b5d3', Dendro: '#8bab76', Electro: '#ad9bd1',
+  Geo: '#d9c68b', Hydro: '#74bbd3', Pyro: '#ed866f',
+};
+
+export const characters = characterCatalog.map((entry) => {
+  const curated = curatedById.get(entry.id);
+  const initials = entry.name.split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toLocaleUpperCase('pt-BR');
+  return {
+    ...entry,
+    ...curated,
+    avatarId: entry.avatarId,
+    iconUrl: entry.icon
+      ? `https://enka.network${entry.icon.replace('UI_AvatarIcon_Side_', 'UI_AvatarIcon_')}`
+      : null,
+    role: curated?.role ?? 'Sem guia',
+    color: curated?.color ?? elementColors[entry.element] ?? '#a9ad95',
+    initials: curated?.initials ?? initials,
+  };
+});
 
 export const teams = [
   {

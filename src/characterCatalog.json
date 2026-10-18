@@ -1,0 +1,1091 @@
+[
+  {
+    "avatarId": 10000002,
+    "id": "enka_10000002",
+    "name": "Kamisato Ayaka",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Ayaka.png"
+  },
+  {
+    "avatarId": 10000003,
+    "id": "enka_10000003",
+    "name": "Jean",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Qin.png"
+  },
+  {
+    "avatarId": 10000005,
+    "id": "traveler",
+    "name": "Viajante",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": null,
+    "icon": "/ui/UI_AvatarIcon_Side_PlayerBoy.png"
+  },
+  {
+    "avatarId": 10000006,
+    "id": "lisa",
+    "name": "Lisa",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Lisa.png"
+  },
+  {
+    "avatarId": 10000014,
+    "id": "barbara",
+    "name": "Barbara",
+    "element": "Hydro",
+    "rarity": 4,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Barbara.png"
+  },
+  {
+    "avatarId": 10000015,
+    "id": "kaeya",
+    "name": "Kaeya",
+    "element": "Cryo",
+    "rarity": 4,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Kaeya.png"
+  },
+  {
+    "avatarId": 10000016,
+    "id": "enka_10000016",
+    "name": "Diluc",
+    "element": "Pyro",
+    "rarity": 5,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Diluc.png"
+  },
+  {
+    "avatarId": 10000020,
+    "id": "enka_10000020",
+    "name": "Razor",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Razor.png"
+  },
+  {
+    "avatarId": 10000021,
+    "id": "amber",
+    "name": "Amber",
+    "element": "Pyro",
+    "rarity": 4,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Ambor.png"
+  },
+  {
+    "avatarId": 10000022,
+    "id": "enka_10000022",
+    "name": "Venti",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Venti.png"
+  },
+  {
+    "avatarId": 10000023,
+    "id": "xiangling",
+    "name": "Xiangling",
+    "element": "Pyro",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Xiangling.png"
+  },
+  {
+    "avatarId": 10000024,
+    "id": "beidou",
+    "name": "Beidou",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Beidou.png"
+  },
+  {
+    "avatarId": 10000025,
+    "id": "xingqiu",
+    "name": "Xingqiu",
+    "element": "Hydro",
+    "rarity": 4,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Xingqiu.png"
+  },
+  {
+    "avatarId": 10000026,
+    "id": "enka_10000026",
+    "name": "Xiao",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Xiao.png"
+  },
+  {
+    "avatarId": 10000027,
+    "id": "enka_10000027",
+    "name": "Ningguang",
+    "element": "Geo",
+    "rarity": 4,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Ningguang.png"
+  },
+  {
+    "avatarId": 10000029,
+    "id": "enka_10000029",
+    "name": "Klee",
+    "element": "Pyro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Klee.png"
+  },
+  {
+    "avatarId": 10000030,
+    "id": "enka_10000030",
+    "name": "Zhongli",
+    "element": "Geo",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Zhongli.png"
+  },
+  {
+    "avatarId": 10000031,
+    "id": "fischl",
+    "name": "Fischl",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Fischl.png"
+  },
+  {
+    "avatarId": 10000032,
+    "id": "bennett",
+    "name": "Bennett",
+    "element": "Pyro",
+    "rarity": 4,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Bennett.png"
+  },
+  {
+    "avatarId": 10000033,
+    "id": "enka_10000033",
+    "name": "Tartaglia",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Tartaglia.png"
+  },
+  {
+    "avatarId": 10000034,
+    "id": "noelle",
+    "name": "Noelle",
+    "element": "Geo",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Noel.png"
+  },
+  {
+    "avatarId": 10000035,
+    "id": "enka_10000035",
+    "name": "Qiqi",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Qiqi.png"
+  },
+  {
+    "avatarId": 10000036,
+    "id": "enka_10000036",
+    "name": "Chongyun",
+    "element": "Cryo",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Chongyun.png"
+  },
+  {
+    "avatarId": 10000037,
+    "id": "enka_10000037",
+    "name": "Ganyu",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Ganyu.png"
+  },
+  {
+    "avatarId": 10000038,
+    "id": "enka_10000038",
+    "name": "Albedo",
+    "element": "Geo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Albedo.png"
+  },
+  {
+    "avatarId": 10000039,
+    "id": "diona",
+    "name": "Diona",
+    "element": "Cryo",
+    "rarity": 4,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Diona.png"
+  },
+  {
+    "avatarId": 10000041,
+    "id": "enka_10000041",
+    "name": "Mona",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Mona.png"
+  },
+  {
+    "avatarId": 10000042,
+    "id": "enka_10000042",
+    "name": "Keqing",
+    "element": "Electro",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Keqing.png"
+  },
+  {
+    "avatarId": 10000043,
+    "id": "sucrose",
+    "name": "Sucrose",
+    "element": "Anemo",
+    "rarity": 4,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Sucrose.png"
+  },
+  {
+    "avatarId": 10000044,
+    "id": "enka_10000044",
+    "name": "Xinyan",
+    "element": "Pyro",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Xinyan.png"
+  },
+  {
+    "avatarId": 10000045,
+    "id": "rosaria",
+    "name": "Rosaria",
+    "element": "Cryo",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Rosaria.png"
+  },
+  {
+    "avatarId": 10000046,
+    "id": "enka_10000046",
+    "name": "Hutao",
+    "element": "Pyro",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Hutao.png"
+  },
+  {
+    "avatarId": 10000047,
+    "id": "enka_10000047",
+    "name": "Kaedehara Kazuha",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Kazuha.png"
+  },
+  {
+    "avatarId": 10000048,
+    "id": "enka_10000048",
+    "name": "Yanfei",
+    "element": "Pyro",
+    "rarity": 4,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Feiyan.png"
+  },
+  {
+    "avatarId": 10000049,
+    "id": "enka_10000049",
+    "name": "Yoimiya",
+    "element": "Pyro",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Yoimiya.png"
+  },
+  {
+    "avatarId": 10000050,
+    "id": "enka_10000050",
+    "name": "Thoma",
+    "element": "Pyro",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Tohma.png"
+  },
+  {
+    "avatarId": 10000051,
+    "id": "enka_10000051",
+    "name": "Eula",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Eula.png"
+  },
+  {
+    "avatarId": 10000052,
+    "id": "enka_10000052",
+    "name": "Shogun Raiden",
+    "element": "Electro",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Shougun.png"
+  },
+  {
+    "avatarId": 10000053,
+    "id": "enka_10000053",
+    "name": "Sayu",
+    "element": "Anemo",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Sayu.png"
+  },
+  {
+    "avatarId": 10000054,
+    "id": "enka_10000054",
+    "name": "Sangonomiya Kokomi",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Kokomi.png"
+  },
+  {
+    "avatarId": 10000055,
+    "id": "enka_10000055",
+    "name": "Gorou",
+    "element": "Geo",
+    "rarity": 4,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Gorou.png"
+  },
+  {
+    "avatarId": 10000056,
+    "id": "enka_10000056",
+    "name": "Kujou Sara",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Sara.png"
+  },
+  {
+    "avatarId": 10000057,
+    "id": "enka_10000057",
+    "name": "Arataki Itto",
+    "element": "Geo",
+    "rarity": 5,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Itto.png"
+  },
+  {
+    "avatarId": 10000058,
+    "id": "enka_10000058",
+    "name": "Yae Miko",
+    "element": "Electro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Yae.png"
+  },
+  {
+    "avatarId": 10000059,
+    "id": "enka_10000059",
+    "name": "Shikanoin Heizou",
+    "element": "Anemo",
+    "rarity": 4,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Heizo.png"
+  },
+  {
+    "avatarId": 10000060,
+    "id": "enka_10000060",
+    "name": "Yelan",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Yelan.png"
+  },
+  {
+    "avatarId": 10000061,
+    "id": "enka_10000061",
+    "name": "Kirara",
+    "element": "Dendro",
+    "rarity": 4,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Momoka.png"
+  },
+  {
+    "avatarId": 10000062,
+    "id": "enka_10000062",
+    "name": "Aloy",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Aloy.png"
+  },
+  {
+    "avatarId": 10000063,
+    "id": "enka_10000063",
+    "name": "Shenhe",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Shenhe.png"
+  },
+  {
+    "avatarId": 10000064,
+    "id": "enka_10000064",
+    "name": "Yunjin",
+    "element": "Geo",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Yunjin.png"
+  },
+  {
+    "avatarId": 10000065,
+    "id": "kuki",
+    "name": "Kuki Shinobu",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Shinobu.png"
+  },
+  {
+    "avatarId": 10000066,
+    "id": "enka_10000066",
+    "name": "Kamisato Ayato",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Ayato.png"
+  },
+  {
+    "avatarId": 10000067,
+    "id": "collei",
+    "name": "Collei",
+    "element": "Dendro",
+    "rarity": 4,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Collei.png"
+  },
+  {
+    "avatarId": 10000068,
+    "id": "enka_10000068",
+    "name": "Dori",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Dori.png"
+  },
+  {
+    "avatarId": 10000069,
+    "id": "enka_10000069",
+    "name": "Tighnari",
+    "element": "Dendro",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Tighnari.png"
+  },
+  {
+    "avatarId": 10000070,
+    "id": "enka_10000070",
+    "name": "Nilou",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Nilou.png"
+  },
+  {
+    "avatarId": 10000071,
+    "id": "enka_10000071",
+    "name": "Cyno",
+    "element": "Electro",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Cyno.png"
+  },
+  {
+    "avatarId": 10000072,
+    "id": "enka_10000072",
+    "name": "Candace",
+    "element": "Hydro",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Candace.png"
+  },
+  {
+    "avatarId": 10000073,
+    "id": "enka_10000073",
+    "name": "Nahida",
+    "element": "Dendro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Nahida.png"
+  },
+  {
+    "avatarId": 10000074,
+    "id": "enka_10000074",
+    "name": "Layla",
+    "element": "Cryo",
+    "rarity": 4,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Layla.png"
+  },
+  {
+    "avatarId": 10000075,
+    "id": "enka_10000075",
+    "name": "Andarilho",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Wanderer.png"
+  },
+  {
+    "avatarId": 10000076,
+    "id": "enka_10000076",
+    "name": "Faruzan",
+    "element": "Anemo",
+    "rarity": 4,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Faruzan.png"
+  },
+  {
+    "avatarId": 10000077,
+    "id": "yaoyao",
+    "name": "Yaoyao",
+    "element": "Dendro",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Yaoyao.png"
+  },
+  {
+    "avatarId": 10000078,
+    "id": "enka_10000078",
+    "name": "Alhaitham",
+    "element": "Dendro",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Alhatham.png"
+  },
+  {
+    "avatarId": 10000079,
+    "id": "enka_10000079",
+    "name": "Dehya",
+    "element": "Pyro",
+    "rarity": 5,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Dehya.png"
+  },
+  {
+    "avatarId": 10000080,
+    "id": "enka_10000080",
+    "name": "Mika",
+    "element": "Cryo",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Mika.png"
+  },
+  {
+    "avatarId": 10000081,
+    "id": "enka_10000081",
+    "name": "Kaveh",
+    "element": "Dendro",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Kaveh.png"
+  },
+  {
+    "avatarId": 10000082,
+    "id": "enka_10000082",
+    "name": "Baizhu",
+    "element": "Dendro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Baizhuer.png"
+  },
+  {
+    "avatarId": 10000083,
+    "id": "lynette",
+    "name": "Lynette",
+    "element": "Anemo",
+    "rarity": 4,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Linette.png"
+  },
+  {
+    "avatarId": 10000084,
+    "id": "enka_10000084",
+    "name": "Lyney",
+    "element": "Pyro",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Liney.png"
+  },
+  {
+    "avatarId": 10000085,
+    "id": "enka_10000085",
+    "name": "Freminet",
+    "element": "Cryo",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Freminet.png"
+  },
+  {
+    "avatarId": 10000086,
+    "id": "enka_10000086",
+    "name": "Wriothesley",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Wriothesley.png"
+  },
+  {
+    "avatarId": 10000087,
+    "id": "enka_10000087",
+    "name": "Neuvillette",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Neuvillette.png"
+  },
+  {
+    "avatarId": 10000088,
+    "id": "enka_10000088",
+    "name": "Charlotte",
+    "element": "Cryo",
+    "rarity": 4,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Charlotte.png"
+  },
+  {
+    "avatarId": 10000089,
+    "id": "enka_10000089",
+    "name": "Furina",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Furina.png"
+  },
+  {
+    "avatarId": 10000090,
+    "id": "enka_10000090",
+    "name": "Chevreuse",
+    "element": "Pyro",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Chevreuse.png"
+  },
+  {
+    "avatarId": 10000091,
+    "id": "enka_10000091",
+    "name": "Navia",
+    "element": "Geo",
+    "rarity": 5,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Navia.png"
+  },
+  {
+    "avatarId": 10000092,
+    "id": "enka_10000092",
+    "name": "Gaming",
+    "element": "Pyro",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Gaming.png"
+  },
+  {
+    "avatarId": 10000093,
+    "id": "enka_10000093",
+    "name": "Xianyun",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Liuyun.png"
+  },
+  {
+    "avatarId": 10000094,
+    "id": "enka_10000094",
+    "name": "Chiori",
+    "element": "Geo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Chiori.png"
+  },
+  {
+    "avatarId": 10000095,
+    "id": "enka_10000095",
+    "name": "Sigewinne",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Sigewinne.png"
+  },
+  {
+    "avatarId": 10000096,
+    "id": "enka_10000096",
+    "name": "Arlecchino",
+    "element": "Pyro",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Arlecchino.png"
+  },
+  {
+    "avatarId": 10000097,
+    "id": "enka_10000097",
+    "name": "Sethos",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Sethos.png"
+  },
+  {
+    "avatarId": 10000098,
+    "id": "enka_10000098",
+    "name": "Clorinde",
+    "element": "Electro",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Clorinde.png"
+  },
+  {
+    "avatarId": 10000099,
+    "id": "enka_10000099",
+    "name": "Emilie",
+    "element": "Dendro",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Emilie.png"
+  },
+  {
+    "avatarId": 10000100,
+    "id": "enka_10000100",
+    "name": "Kachina",
+    "element": "Geo",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Kachina.png"
+  },
+  {
+    "avatarId": 10000101,
+    "id": "enka_10000101",
+    "name": "Kinich",
+    "element": "Dendro",
+    "rarity": 5,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Kinich.png"
+  },
+  {
+    "avatarId": 10000102,
+    "id": "enka_10000102",
+    "name": "Mualani",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Mualani.png"
+  },
+  {
+    "avatarId": 10000103,
+    "id": "enka_10000103",
+    "name": "Xilonen",
+    "element": "Geo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Xilonen.png"
+  },
+  {
+    "avatarId": 10000104,
+    "id": "enka_10000104",
+    "name": "Chasca",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Chasca.png"
+  },
+  {
+    "avatarId": 10000105,
+    "id": "enka_10000105",
+    "name": "Ororon",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Olorun.png"
+  },
+  {
+    "avatarId": 10000106,
+    "id": "enka_10000106",
+    "name": "Mavuika",
+    "element": "Pyro",
+    "rarity": 5,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Mavuika.png"
+  },
+  {
+    "avatarId": 10000107,
+    "id": "enka_10000107",
+    "name": "Citlali",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Citlali.png"
+  },
+  {
+    "avatarId": 10000108,
+    "id": "enka_10000108",
+    "name": "Lan Yan",
+    "element": "Anemo",
+    "rarity": 4,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Lanyan.png"
+  },
+  {
+    "avatarId": 10000109,
+    "id": "enka_10000109",
+    "name": "Yumemizuki Mizuki",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Mizuki.png"
+  },
+  {
+    "avatarId": 10000110,
+    "id": "enka_10000110",
+    "name": "Iansan",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Iansan.png"
+  },
+  {
+    "avatarId": 10000111,
+    "id": "enka_10000111",
+    "name": "Varesa",
+    "element": "Electro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Varesa.png"
+  },
+  {
+    "avatarId": 10000112,
+    "id": "enka_10000112",
+    "name": "Escoffier",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Escoffier.png"
+  },
+  {
+    "avatarId": 10000113,
+    "id": "enka_10000113",
+    "name": "Ifa",
+    "element": "Anemo",
+    "rarity": 4,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Ifa.png"
+  },
+  {
+    "avatarId": 10000114,
+    "id": "enka_10000114",
+    "name": "Skirk",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_SkirkNew.png"
+  },
+  {
+    "avatarId": 10000115,
+    "id": "enka_10000115",
+    "name": "Dahlia",
+    "element": "Hydro",
+    "rarity": 4,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Dahlia.png"
+  },
+  {
+    "avatarId": 10000116,
+    "id": "enka_10000116",
+    "name": "Ineffa",
+    "element": "Electro",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Ineffa.png"
+  },
+  {
+    "avatarId": 10000119,
+    "id": "enka_10000119",
+    "name": "Lauma",
+    "element": "Dendro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Lauma.png"
+  },
+  {
+    "avatarId": 10000120,
+    "id": "enka_10000120",
+    "name": "Flins",
+    "element": "Electro",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Flins.png"
+  },
+  {
+    "avatarId": 10000121,
+    "id": "enka_10000121",
+    "name": "Aino",
+    "element": "Hydro",
+    "rarity": 4,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Aino.png"
+  },
+  {
+    "avatarId": 10000122,
+    "id": "enka_10000122",
+    "name": "Nefer",
+    "element": "Dendro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Nefer.png"
+  },
+  {
+    "avatarId": 10000123,
+    "id": "enka_10000123",
+    "name": "Durin",
+    "element": "Pyro",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Durin.png"
+  },
+  {
+    "avatarId": 10000124,
+    "id": "enka_10000124",
+    "name": "Jahoda",
+    "element": "Anemo",
+    "rarity": 4,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Jahoda.png"
+  },
+  {
+    "avatarId": 10000125,
+    "id": "enka_10000125",
+    "name": "Columbina",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Columbina.png"
+  },
+  {
+    "avatarId": 10000126,
+    "id": "enka_10000126",
+    "name": "Zibai",
+    "element": "Geo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Zibai.png"
+  },
+  {
+    "avatarId": 10000127,
+    "id": "enka_10000127",
+    "name": "Illuga",
+    "element": "Geo",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Illuga.png"
+  },
+  {
+    "avatarId": 10000128,
+    "id": "enka_10000128",
+    "name": "Varka",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_Varka.png"
+  },
+  {
+    "avatarId": 10000129,
+    "id": "enka_10000129",
+    "name": "Lohen",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Lohen.png"
+  },
+  {
+    "avatarId": 10000130,
+    "id": "enka_10000130",
+    "name": "Linnea",
+    "element": "Geo",
+    "rarity": 5,
+    "weapon": "Arco",
+    "icon": "/ui/UI_AvatarIcon_Side_Linnea.png"
+  },
+  {
+    "avatarId": 10000131,
+    "id": "enka_10000131",
+    "name": "Nicole",
+    "element": "Pyro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Nicole.png"
+  },
+  {
+    "avatarId": 10000132,
+    "id": "enka_10000132",
+    "name": "Prune",
+    "element": "Anemo",
+    "rarity": 4,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Prune.png"
+  },
+  {
+    "avatarId": 10000133,
+    "id": "enka_10000133",
+    "name": "Sandrone",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Espadão",
+    "icon": "/ui/UI_AvatarIcon_Side_MarionetteNew.png"
+  },
+  {
+    "avatarId": 10000140,
+    "id": "enka_10000140",
+    "name": "Vodyanitsa",
+    "element": "Hydro",
+    "rarity": 5,
+    "weapon": "Catalisador",
+    "icon": "/ui/UI_AvatarIcon_Side_Vodyanitsa.png"
+  },
+  {
+    "avatarId": 10000143,
+    "id": "enka_10000143",
+    "name": "Vesna",
+    "element": "Anemo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Vesna.png"
+  },
+  {
+    "avatarId": 10000148,
+    "id": "enka_10000148",
+    "name": "Alyosha",
+    "element": "Electro",
+    "rarity": 4,
+    "weapon": "Lança",
+    "icon": "/ui/UI_AvatarIcon_Side_Alyosha.png"
+  },
+  {
+    "avatarId": 10000150,
+    "id": "enka_10000150",
+    "name": "Odette",
+    "element": "Cryo",
+    "rarity": 5,
+    "weapon": "Espada",
+    "icon": "/ui/UI_AvatarIcon_Side_Odette.png"
+  }
+]

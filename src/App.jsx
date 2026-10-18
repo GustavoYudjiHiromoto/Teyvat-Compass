@@ -639,7 +639,7 @@ export default function App() {
         <section className="library-section" id="character-library">
           <div className="library-heading">
             <div><div className="section-kicker">SEU ELENCO <span>✧</span></div><h2>Quem já está com você?</h2><p>Toque em um personagem para marcar ou desmarcar.</p></div>
-            <div className="roster-counter"><strong>{String(roster.length).padStart(2, '0')}</strong><span>DE {characters.length} NO<br />CATÁLOGO INICIAL</span></div>
+            <div className="roster-counter"><strong>{String(roster.length).padStart(2, '0')}</strong><span>DE {characters.length} NO<br />CATÁLOGO</span></div>
           </div>
           <form className="showcase-import" onSubmit={importShowcase}>
             <div className="showcase-import-copy"><strong>Importar do Showcase público</strong><span>Adiciona ao elenco os personagens que aparecem no seu perfil do jogo.</span></div>
@@ -661,7 +661,7 @@ export default function App() {
             <button className={`owned-filter${ownedOnly ? ' selected' : ''}`} onClick={() => setOwnedOnly(!ownedOnly)}><span>{ownedOnly ? '✓' : '○'}</span> Tenho</button>
           </div>
           {filteredCharacters.length ? <div className="character-grid">{filteredCharacters.map((character) => <button key={character.id} className={`character-card${roster.includes(character.id) ? ' character-card--owned' : ''}`} onClick={() => toggleCharacter(character.id)}>
-            <div className="character-portrait" style={{ '--character-color': character.color }}><div className="portrait-halo" /><span className="portrait-initials">{character.initials}</span><span className="portrait-element">{character.element === 'Electro' ? 'ϟ' : character.element === 'Pyro' ? '♨' : character.element === 'Hydro' ? '◌' : character.element === 'Cryo' ? '❄' : character.element === 'Anemo' ? '〰' : '◇'}</span>{roster.includes(character.id) && <span className="owned-check">✓</span>}</div>
+            <div className="character-portrait" style={{ '--character-color': character.color }}><div className="portrait-halo" />{character.iconUrl && <img className="portrait-image" src={character.iconUrl} alt="" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; }} />}<span className="portrait-initials">{character.initials}</span><span className="portrait-element">{character.element === 'Electro' ? 'ϟ' : character.element === 'Pyro' ? '♨' : character.element === 'Hydro' ? '◌' : character.element === 'Cryo' ? '❄' : character.element === 'Anemo' ? '〰' : '◇'}</span>{roster.includes(character.id) && <span className="owned-check">✓</span>}</div>
             <div className="character-details"><div className="character-name-row"><strong>{character.name}</strong><span>{'★'.repeat(character.rarity)}</span></div><div className="character-subline"><span>{character.element}</span><i />{character.role}</div></div>
             <div className={`ownership-state${roster.includes(character.id) ? ' ownership-state--owned' : ''}`}>{roster.includes(character.id) ? 'NO SEU ELENCO' : '+ ADICIONAR'}</div>
           </button>)}</div> : <div className="empty-state"><span>⌕</span><strong>Nenhum viajante encontrado</strong><p>Tente outro nome, elemento ou filtro.</p></div>}
