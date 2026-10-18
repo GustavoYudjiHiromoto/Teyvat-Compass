@@ -8,6 +8,7 @@ import { enkaAvatarToCharacter, getEnkaCache, saveEnkaCache } from './enka.js';
 const STORAGE_KEY = 'teyvat-compass-roster-v1';
 const WEAPON_STORAGE_KEY = 'teyvat-compass-weapons-v1';
 const ENKA_SHOWCASE_STORAGE_KEY = 'teyvat-compass-showcase-v1';
+const GOALS_STORAGE_KEY = 'teyvat-compass-goals-v1';
 const LOCAL_PROFILE_OWNER_KEY = 'teyvat-compass-profile-owner-v1';
 const readRoster = () => {
   try {
@@ -31,6 +32,14 @@ const readEnkaShowcase = () => {
     return saved && Array.isArray(saved.avatars) ? saved : null;
   } catch {
     return null;
+  }
+};
+const readGoals = () => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(GOALS_STORAGE_KEY));
+    return Array.isArray(saved) ? saved : [];
+  } catch {
+    return [];
   }
 };
 const pageFromHash = (hash) => {
@@ -213,7 +222,7 @@ function TeamCard({ team, roster, evaluation, onEditRoster, onOpenBuilds }) {
 
 const getCharacter = (id) => characters.find((character) => character.id === id);
 
-function CharacterBuildCard({ character, build, ownedWeapons, onToggleWeapon }) {
+function CharacterBuildCard({ character, build, ownedWeapons, onToggleWeapon, onAddToPlan, hasBuildGoal }) {
   return <article className="character-build">
     <div className="character-build-heading"><span style={{ '--character-color': character.color }}>{character.initials}</span><div><strong>{character.name}</strong><small>{build.style}</small></div></div>
     <div className="build-weapon-detail">
@@ -232,6 +241,7 @@ function CharacterBuildCard({ character, build, ownedWeapons, onToggleWeapon }) 
     <div className="build-detail"><b>Subatributos</b><span>{build.substats}</span></div>
     <p className="build-note">{build.note}</p>
     <a className="build-source" href={build.source} target="_blank" rel="noreferrer">Fonte: {buildSourceName} ↗</a>
+    <button className="build-plan-action" type="button" onClick={onAddToPlan} disabled={hasBuildGoal}>{hasBuildGoal ? '✓ Meta já está no Meu plano' : '＋ Acompanhar esta build no Meu plano'}</button>
   </article>;
 }
 const statLabels = {
@@ -409,9 +419,12 @@ export default function App() {
   const [roster, setRoster] = useState(() => supabase ? [] : readRoster());
   const [ownedWeapons, setOwnedWeapons] = useState(() => supabase ? [] : readOwnedWeapons());
   const [enkaShowcase, setEnkaShowcase] = useState(() => supabase ? null : readEnkaShowcase());
+  const [goals, setGoals] = useState(() => supabase ? [] : readGoals());
   const [selectedShowcaseCharacterId, setSelectedShowcaseCharacterId] = useState(null);
   const [session, setSession] = useState(null);
   const [loadedProfileUserId, setLoadedProfileUserId] = useState(null);
+  const [cloudGoalsAvailable, setCloudGoalsAvailable] = useState(true);
+  const [localProfileReady, setLocalProfileReady] = useState(!supabase);
   const [profileStatus, setProfileStatus] = useState('local');
   const [profileFeedback, setProfileFeedback] = useState('');
   const [query, setQuery] = useState('');
@@ -457,6 +470,7 @@ export default function App() {
   useEffect(() => {
     if (!supabase || !session?.user?.id) {
       setLoadedProfileUserId(null);
+      setLocalProfileReady(true);
       setProfileStatus('local');
       setProfileFeedback('');
       const hasSignedInLocalProfile = supabase && localStorage.getItem(LOCAL_PROFILE_OWNER_KEY);
@@ -464,16 +478,20 @@ export default function App() {
         setRoster([]);
         setOwnedWeapons([]);
         setEnkaShowcase(null);
+        setGoals([]);
       } else {
         setRoster(readRoster());
         setOwnedWeapons(readOwnedWeapons());
         setEnkaShowcase(readEnkaShowcase());
+        setGoals(readGoals());
       }
       return undefined;
     }
     let active = true;
     const userId = session.user.id;
+    setLocalProfileReady(false);
     setLoadedProfileUserId(null);
+    setCloudGoalsAvailable(false);
     setProfileStatus('loading');
     setProfileFeedback('');
 
@@ -486,18 +504,35 @@ export default function App() {
       if (!active) return;
       if (error) {
         setProfileStatus('error');
-        setProfileFeedback('Confira a configuração da tabela e das políticas RLS no Supabase.');
+        setProfileFeedback('Não foi possível carregar o perfil da nuvem. Seus dados salvos anteriormente não foram apagados; confira a conexão e as políticas RLS.');
+        if (localStorage.getItem(LOCAL_PROFILE_OWNER_KEY) === userId) {
+          setRoster(readRoster());
+          setOwnedWeapons(readOwnedWeapons());
+          setEnkaShowcase(readEnkaShowcase());
+          setGoals(readGoals());
+        }
         return;
       }
+
+      const { data: goalsData, error: goalsError } = await supabase
+        .from('player_profiles')
+        .select('goals')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (!active) return;
+      const supportsCloudGoals = !goalsError;
+      setCloudGoalsAvailable(supportsCloudGoals);
 
       const localOwnerId = localStorage.getItem(LOCAL_PROFILE_OWNER_KEY);
       const canImportLocal = !localOwnerId || localOwnerId === userId;
       const nextRoster = Array.isArray(data?.roster) ? data.roster : canImportLocal ? readRoster() : [];
       const nextWeapons = Array.isArray(data?.owned_weapons) ? data.owned_weapons : canImportLocal ? readOwnedWeapons() : [];
       const nextShowcase = data?.enka_showcase?.avatars ? data.enka_showcase : canImportLocal ? readEnkaShowcase() : null;
+      const nextGoals = Array.isArray(goalsData?.goals) ? goalsData.goals : canImportLocal ? readGoals() : [];
       setRoster(nextRoster);
       setOwnedWeapons(nextWeapons);
       setEnkaShowcase(nextShowcase);
+      setGoals(nextGoals);
 
       if (!data) {
         setProfileStatus('migrating');
@@ -506,6 +541,7 @@ export default function App() {
           roster: nextRoster,
           owned_weapons: nextWeapons,
           enka_showcase: nextShowcase || {},
+          ...(supportsCloudGoals ? { goals: nextGoals } : {}),
           updated_at: new Date().toISOString(),
         }, { onConflict: 'user_id' });
         if (!active) return;
@@ -517,6 +553,7 @@ export default function App() {
       }
       setLoadedProfileUserId(userId);
       setProfileStatus('synced');
+      setProfileFeedback(supportsCloudGoals ? '' : 'Perfil carregado. Para sincronizar objetivos na nuvem, execute o schema.sql atualizado no Supabase. Seus objetivos continuam salvos neste navegador.');
     };
 
     loadProfile().catch(() => {
@@ -537,27 +574,39 @@ export default function App() {
         localStorage.setItem(WEAPON_STORAGE_KEY, JSON.stringify(ownedWeapons));
         if (enkaShowcase) localStorage.setItem(ENKA_SHOWCASE_STORAGE_KEY, JSON.stringify(enkaShowcase));
         else localStorage.removeItem(ENKA_SHOWCASE_STORAGE_KEY);
+        localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goals));
         localStorage.setItem(LOCAL_PROFILE_OWNER_KEY, userId);
       } catch {
         // A cloud save should still work if browser storage is unavailable.
       }
-      const { error } = await supabase.from('player_profiles').upsert({
+      const profileUpdate = {
         user_id: userId,
         roster,
         owned_weapons: ownedWeapons,
         enka_showcase: enkaShowcase || {},
         updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' });
+      };
+      if (cloudGoalsAvailable) profileUpdate.goals = goals;
+      const { error } = await supabase.from('player_profiles').upsert(profileUpdate, { onConflict: 'user_id' });
       if (error) {
         setProfileStatus('error');
         setProfileFeedback('Não foi possível sincronizar agora. Seus dados continuam guardados neste navegador.');
       } else {
         setProfileStatus('synced');
-        setProfileFeedback('');
+        setProfileFeedback(cloudGoalsAvailable ? '' : 'Elenco sincronizado. Os objetivos ficam neste navegador até executar o schema.sql atualizado no Supabase.');
       }
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [roster, ownedWeapons, enkaShowcase, session?.user?.id, loadedProfileUserId]);
+  }, [roster, ownedWeapons, enkaShowcase, goals, cloudGoalsAvailable, session?.user?.id, loadedProfileUserId]);
+
+  useEffect(() => {
+    if (!localProfileReady || (supabase && session?.user?.id)) return;
+    try {
+      localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goals));
+    } catch {
+      // A interface continua funcionando nesta sessão se o navegador bloquear armazenamento.
+    }
+  }, [goals, session?.user?.id, localProfileReady]);
 
   const toggleCharacter = (id) => {
     setRoster((current) => {
@@ -581,6 +630,63 @@ export default function App() {
       }
       return next;
     });
+  };
+
+  const addGoal = (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const title = String(formData.get('title') || '').trim();
+    const target = Math.max(1, Number(formData.get('target')) || 1);
+    const progress = Math.min(target, Math.max(0, Number(formData.get('progress')) || 0));
+    if (!title) return;
+    setGoals((current) => [{
+      id: crypto.randomUUID(),
+      title,
+      category: String(formData.get('category') || 'other'),
+      characterId: String(formData.get('characterId') || ''),
+      progress,
+      target,
+      createdAt: new Date().toISOString(),
+    }, ...current]);
+    event.currentTarget.reset();
+  };
+
+  const changeGoalProgress = (goalId, amount) => {
+    setGoals((current) => current.map((goal) => goal.id === goalId
+      ? { ...goal, progress: Math.min(goal.target, Math.max(0, goal.progress + amount)) }
+      : goal));
+  };
+
+  const addBuildGoal = (character, build) => {
+    const existing = goals.some((goal) => goal.category === 'build' && goal.characterId === character.id && goal.progress < goal.target);
+    if (!existing) {
+      const weapon = build.weapons.find((name) => ownedWeapons.includes(name)) || build.weapons[0];
+      setGoals((current) => [{
+        id: crypto.randomUUID(),
+        title: `Completar build recomendada de ${character.name}`,
+        category: 'build',
+        characterId: character.id,
+        progress: 0,
+        target: 3,
+        checklist: [
+          { id: 'weapon', label: `Obter e equipar ${weapon}`, done: false },
+          { id: 'artifacts', label: `Conseguir ${build.artifacts[0]}`, done: false },
+          { id: 'main-stats', label: `Ajustar atributos: ${build.mainStats}`, done: false },
+        ],
+        createdAt: new Date().toISOString(),
+      }, ...current]);
+    }
+    goTo(navItems[0]);
+    window.setTimeout(() => document.getElementById('my-goals')?.scrollIntoView({ behavior: 'smooth' }), 0);
+  };
+
+  const toggleGoalTask = (goalId, taskId) => {
+    setGoals((current) => current.map((goal) => {
+      if (goal.id !== goalId || !Array.isArray(goal.checklist)) return goal;
+      const checklist = goal.checklist.map((task) => task.id === taskId ? { ...task, done: !task.done } : task);
+      const progress = checklist.filter((task) => task.done).length;
+      return { ...goal, checklist, progress, target: checklist.length };
+    }));
   };
 
   const importShowcase = async (event) => {
@@ -814,7 +920,7 @@ export default function App() {
                 <div className="builds-page-intro"><strong>{ownedBuilds.length} de {roster.length} personagens do elenco têm guias cadastrados.</strong><span>Abra um personagem para conferir alternativas de armas, artefatos e atributos. Marque as armas que você possui para vê-las primeiro.</span></div>
                 <div className="owned-build-grid">{ownedBuilds.map((character) => <details className="owned-build-panel" key={character.id}>
                   <summary><span className="owned-build-icon" style={{ '--character-color': character.color }}>{character.initials}</span><span><strong>{character.name}</strong><small>{builds[character.id].style}</small></span><b aria-hidden="true">＋</b></summary>
-                  <CharacterBuildCard character={character} build={builds[character.id]} ownedWeapons={ownedWeapons} onToggleWeapon={toggleWeapon} />
+                  <CharacterBuildCard character={character} build={builds[character.id]} ownedWeapons={ownedWeapons} onToggleWeapon={toggleWeapon} onAddToPlan={() => addBuildGoal(character, builds[character.id])} hasBuildGoal={goals.some((goal) => goal.category === 'build' && goal.characterId === character.id && goal.progress < goal.target)} />
                 </details>)}</div>
               </details>
             </> : <div className="empty-state builds-empty-state"><span>⌖</span><strong>Estamos preparando estes guias</strong><p>Os personagens do seu elenco ainda não têm recomendações cadastradas. Selecione outros no catálogo para ver os guias disponíveis.</p><button className="primary-button" onClick={() => goTo(navItems[1])}>Ver Personagens <span>→</span></button></div>}
@@ -842,10 +948,34 @@ export default function App() {
           </details>}
         </section>}
 
-        {activeNav === 'Meu plano' && <section className="map-preview" id="map-preview">
-          <div className="map-mini-art"><div className="map-grid-lines" /><span className="map-pin">⌖</span><i className="map-route" /></div>
-          <div className="map-preview-copy"><span className="section-kicker">SEU PRÓXIMO CAPÍTULO <span>✧</span></span><h2>Explore no seu ritmo.</h2><p>Um mapa com seus pontos de interesse e o progresso da sua jornada está no horizonte.</p></div>
-          <span className="coming-soon">EM BREVE</span>
+        {activeNav === 'Meu plano' && <section className="goals-section" id="my-goals">
+          <div className="section-heading goals-heading">
+            <div><div className="section-kicker">SEU PRÓXIMO CAPÍTULO <span>✧</span></div><h2>Meus objetivos</h2><p>Organize o que quer melhorar e acompanhe seu progresso.</p></div>
+            <div className="recommendation-count"><strong>{goals.filter((goal) => goal.progress >= goal.target).length}/{goals.length}</strong><span>OBJETIVOS<br />CONCLUÍDOS</span></div>
+          </div>
+          <form className="goal-form" onSubmit={addGoal}>
+            <label className="goal-title-field"><span>Objetivo</span><input name="title" required maxLength={90} placeholder="Ex.: levar a Xiangling ao nível 80" /></label>
+            <label><span>Tipo</span><select name="category"><option value="character">Personagem</option><option value="weapon">Arma</option><option value="artifacts">Artefatos</option><option value="exploration">Exploração</option><option value="other">Outro</option></select></label>
+            <label><span>Personagem</span><select name="characterId"><option value="">Nenhum</option>{roster.map((id) => getCharacter(id)).filter(Boolean).map((character) => <option key={character.id} value={character.id}>{character.name}</option>)}</select></label>
+            <label className="goal-number-field"><span>Progresso</span><input name="progress" type="number" min="0" defaultValue="0" /></label>
+            <label className="goal-number-field"><span>Meta</span><input name="target" type="number" min="1" defaultValue="1" /></label>
+            <button className="primary-button" type="submit">Adicionar objetivo <span>＋</span></button>
+          </form>
+          {goals.length ? <div className="goal-list">{goals.map((goal) => {
+            const character = goal.characterId ? getCharacter(goal.characterId) : null;
+            const hasChecklist = Array.isArray(goal.checklist);
+            const progress = hasChecklist ? goal.checklist.filter((task) => task.done).length : goal.progress;
+            const target = hasChecklist ? goal.checklist.length : goal.target;
+            const complete = progress >= target;
+            const percentage = target ? Math.round((progress / target) * 100) : 0;
+            return <article className={`goal-card${complete ? ' goal-card--complete' : ''}`} key={goal.id}>
+              <div className="goal-card-heading"><div><span className="goal-category">{{ character: 'PERSONAGEM', weapon: 'ARMA', artifacts: 'ARTEFATOS', exploration: 'EXPLORAÇÃO', build: 'BUILD', other: 'OUTRO' }[goal.category] || 'OBJETIVO'}</span><h3>{goal.title}</h3>{character && <small>{character.name}</small>}</div><button type="button" className="goal-remove" aria-label={`Remover objetivo: ${goal.title}`} onClick={() => setGoals((current) => current.filter((item) => item.id !== goal.id))}>×</button></div>
+              {hasChecklist && <div className="goal-checklist">{goal.checklist.map((task) => <label className={task.done ? 'goal-task goal-task--done' : 'goal-task'} key={task.id}><input type="checkbox" checked={task.done} onChange={() => toggleGoalTask(goal.id, task.id)} /><span>{task.label}</span></label>)}</div>}
+              <div className="goal-progress-track" role="progressbar" aria-label={`Progresso de ${goal.title}`} aria-valuenow={progress} aria-valuemin="0" aria-valuemax={target}><span style={{ width: `${percentage}%` }} /></div>
+              <div className="goal-card-footer"><span>{complete ? 'Concluído' : `${progress} de ${target}`} · {percentage}%</span>{!hasChecklist && <div><button type="button" onClick={() => changeGoalProgress(goal.id, -1)} disabled={goal.progress === 0} aria-label="Diminuir progresso">−</button><button type="button" onClick={() => changeGoalProgress(goal.id, 1)} disabled={complete} aria-label="Aumentar progresso">＋</button></div>}</div>
+            </article>;
+          })}</div> : <div className="empty-state goals-empty-state"><span>✧</span><strong>Seu primeiro objetivo começa aqui</strong><p>Crie uma meta para acompanhar personagens, armas, artefatos ou exploração.</p></div>}
+          <p className="goals-save-note">{session?.user && !cloudGoalsAvailable ? 'Objetivos salvos neste navegador. Execute o schema.sql atualizado para sincronizá-los na nuvem.' : session?.user && profileStatus === 'synced' ? 'Objetivos sincronizados com sua conta.' : session?.user && profileStatus === 'saving' ? 'Sincronizando objetivos…' : session?.user && profileStatus === 'error' ? 'Não foi possível sincronizar agora; os dados locais permanecem neste navegador.' : 'Objetivos salvos automaticamente neste navegador.'}</p>
         </section>}
         <footer className="page-footer"><span>TEYVAT COMPASS <i>✦</i> UMA FERRAMENTA FEITA POR FÃS</span><span>Não afiliado à HoYoverse. Genshin Impact é propriedade da HoYoverse.</span></footer>
       </main>
