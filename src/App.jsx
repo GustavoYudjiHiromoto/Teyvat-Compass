@@ -166,10 +166,12 @@ function AccountMenu({ session, profileStatus, profileFeedback }) {
   );
 }
 
-function TeamCard({ team, roster, evaluation, onEditRoster, onOpenBuilds }) {
+function TeamCard({ team, roster, evaluation, focusCharacterId, onEditRoster, onOpenTeamBuilds }) {
   const complete = evaluation.coveredCount === team.slots.length;
   const missingSlots = team.slots.filter((slot, index) => !evaluation.lineup[index]);
   const assignedIds = new Set(evaluation.lineup.filter(Boolean).map((selection) => selection.characterId));
+  const suggestedMembers = team.slots.map((slot, index) => evaluation.lineup[index]?.character || getCharacter(slot.characterId));
+  const availableBuildCount = suggestedMembers.filter((character) => character && builds[character.id]).length;
   const statusLabel = !roster.length
     ? team.difficulty
     : complete && evaluation.alternativeCount === 0
@@ -186,6 +188,7 @@ function TeamCard({ team, roster, evaluation, onEditRoster, onOpenBuilds }) {
       </div>
       <div className="team-title-row"><h3>{team.title}</h3><span className="team-arrow">↗</span></div>
       <p className="team-subtitle">{team.subtitle}</p>
+      {focusCharacterId && <p className="team-focus-label">✦ Time recomendado com {getCharacter(focusCharacterId)?.name} no elenco</p>}
       <div className="team-tags">{team.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
       <div className="team-lineup">
         {team.slots.map((slot, index) => {
@@ -203,7 +206,9 @@ function TeamCard({ team, roster, evaluation, onEditRoster, onOpenBuilds }) {
           );
         })}
       </div>
-      <button className="team-build-action" type="button" onClick={onOpenBuilds}>Ver recomendações de build <span>→</span></button>
+      <button className="team-build-action" type="button" onClick={() => onOpenTeamBuilds(team.id)}>
+        Ver builds deste time <span>{availableBuildCount} guias · abrir →</span>
+      </button>
       <div className="team-explanation">
         <span className="explanation-icon">✧</span>
         <div>
@@ -226,6 +231,57 @@ function TeamCard({ team, roster, evaluation, onEditRoster, onOpenBuilds }) {
       </button>
     </article>
   );
+}
+
+function TeamBuildWorkspace({ team, evaluation, selectedCharacterId, onSelectCharacter, onBack, ownedWeapons, goals, onToggleWeapon, onAddBuildGoal, onOpenBuilds }) {
+  const members = team.slots.map((slot, index) => ({
+    slot,
+    selection: evaluation.lineup[index],
+    character: evaluation.lineup[index]?.character || getCharacter(slot.characterId),
+  }));
+  const selectedMember = members.find(({ character }) => character?.id === selectedCharacterId)
+    || members.find(({ character }) => character && builds[character.id])
+    || members.find(({ character }) => character);
+  const selectedCharacter = selectedMember?.character;
+
+  return <section className="team-build-workspace" id="team-build-workspace" aria-labelledby="team-build-workspace-title">
+    <div className="team-build-workspace-heading">
+      <button className="team-build-back" type="button" onClick={onBack}>← Voltar aos times</button>
+      <div className="section-kicker">BUILDS DA COMPOSIÇÃO <span>✧</span></div>
+      <h3 id="team-build-workspace-title">{team.title}</h3>
+      <p>{team.subtitle}</p>
+      <div className="team-build-context">{team.tags.map((tag) => <span key={tag}>{tag}</span>)}<span>{evaluation.coveredCount}/{team.slots.length} integrantes no seu elenco</span></div>
+      {members.some(({ selection }) => selection?.kind === 'alternative') && <p className="team-build-alternatives">{members.filter(({ selection }) => selection?.kind === 'alternative').map(({ character, slot }) => `${character.name} substitui ${getCharacter(slot.characterId)?.name}`).join(' · ')}</p>}
+    </div>
+    <div className="team-build-workspace-layout">
+      <nav className="team-build-member-list" aria-label={`Integrantes de ${team.title}`}>
+        <h4>Escolha um integrante</h4>
+        {members.map(({ slot, selection, character }) => {
+          const hasGuide = Boolean(character && builds[character.id]);
+          const isSelected = selectedCharacter?.id === character?.id;
+          const isOwned = Boolean(selection);
+          return <button key={slot.characterId} type="button" aria-pressed={isSelected} className={`team-build-member${isSelected ? ' is-selected' : ''}${!hasGuide ? ' has-no-guide' : ''}`} onClick={() => character && onSelectCharacter(team.id, character.id)} disabled={!character}>
+            {character && <span className="team-build-avatar" style={{ '--character-color': character.color }}>{character.initials}</span>}
+            <span className="team-build-member-copy"><strong>{character?.name || 'Posição vaga'}</strong><small>{slot.role}{selection?.kind === 'alternative' ? ` · substitui ${getCharacter(slot.characterId)?.name}` : ''}</small><small>{!isOwned ? 'Sugestão fora do seu elenco' : hasGuide ? 'Guia disponível' : 'Guia ainda não cadastrado'}</small></span>
+            <b aria-hidden="true">{isSelected ? '›' : ''}</b>
+          </button>;
+        })}
+      </nav>
+      <div className="team-build-detail">
+        {selectedCharacter && builds[selectedCharacter.id] ? <>
+          <CharacterBuildCard
+            character={selectedCharacter}
+            build={builds[selectedCharacter.id]}
+            ownedWeapons={ownedWeapons}
+            onToggleWeapon={onToggleWeapon}
+            onAddToPlan={() => onAddBuildGoal(selectedCharacter, builds[selectedCharacter.id])}
+            hasBuildGoal={goals.some((goal) => goal.category === 'build' && goal.characterId === selectedCharacter.id && goal.progress < goal.target)}
+          />
+          <button className="team-builds-all" type="button" onClick={onOpenBuilds}>Ver todos os guias do elenco <span>→</span></button>
+        </> : selectedCharacter ? <div className="team-builds-empty"><strong>Guia ainda não cadastrado para {selectedCharacter.name}.</strong><span>A formação e as alternativas continuam visíveis. Você pode abrir os guias cadastrados para os outros personagens do seu elenco.</span><button className="team-builds-all" type="button" onClick={onOpenBuilds}>Ver todos os guias do elenco <span>→</span></button></div> : <div className="team-builds-empty"><strong>Este time ainda não tem integrantes selecionados.</strong><span>Marque personagens no seu elenco para comparar a composição com os guias disponíveis.</span></div>}
+      </div>
+    </div>
+  </section>;
 }
 
 const getCharacter = (id) => characters.find((character) => character.id === id);
@@ -429,6 +485,9 @@ export default function App() {
   const [enkaShowcase, setEnkaShowcase] = useState(() => supabase ? null : readEnkaShowcase());
   const [goals, setGoals] = useState(() => supabase ? [] : readGoals());
   const [selectedShowcaseCharacterId, setSelectedShowcaseCharacterId] = useState(null);
+  const [teamFocusCharacterId, setTeamFocusCharacterId] = useState('');
+  const [selectedTeamBuildCharacters, setSelectedTeamBuildCharacters] = useState({});
+  const [selectedBuildTeamId, setSelectedBuildTeamId] = useState('');
   const [session, setSession] = useState(null);
   const [loadedProfileUserId, setLoadedProfileUserId] = useState(null);
   const [cloudGoalsAvailable, setCloudGoalsAvailable] = useState(true);
@@ -748,6 +807,15 @@ export default function App() {
     window.setTimeout(() => document.getElementById('my-goals')?.scrollIntoView({ behavior: 'smooth' }), 0);
   };
 
+  const selectTeamBuildCharacter = (teamId, characterId) => {
+    setSelectedTeamBuildCharacters((current) => ({ ...current, [teamId]: characterId }));
+  };
+
+  const openTeamBuilds = (teamId) => {
+    setSelectedBuildTeamId(teamId);
+    window.setTimeout(() => document.getElementById('team-build-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+  };
+
   const toggleGoalTask = (goalId, taskId) => {
     setGoals((current) => current.map((goal) => {
       if (goal.id !== goalId || !Array.isArray(goal.checklist)) return goal;
@@ -849,14 +917,29 @@ export default function App() {
     setCharacterPage(1);
   }, [query, elementFilter, weaponFilter, rarityFilter, sortOrder, ownedOnly, pageSize]);
 
+  useEffect(() => {
+    if (teamFocusCharacterId && !roster.includes(teamFocusCharacterId)) setTeamFocusCharacterId('');
+  }, [roster, teamFocusCharacterId]);
+
   const rankedTeams = useMemo(() => teams
-    .map((team) => ({ team, evaluation: evaluateTeam(team, roster) }))
+    .map((team) => ({ team, evaluation: evaluateTeam(team, roster, teamFocusCharacterId) }))
+    .filter(({ evaluation }) => !teamFocusCharacterId || evaluation.includesFocus)
     .sort((a, b) => {
       if (!roster.length) return a.team.priority - b.team.priority;
       return b.evaluation.coveredCount - a.evaluation.coveredCount
         || b.evaluation.coreCount - a.evaluation.coreCount
         || a.team.priority - b.team.priority;
-    }), [roster]);
+    }), [roster, teamFocusCharacterId]);
+
+  const focusCharacters = useMemo(() => roster
+    .map(getCharacter)
+    .filter(Boolean)
+    .sort((left, right) => (left.release ?? Number.MAX_SAFE_INTEGER) - (right.release ?? Number.MAX_SAFE_INTEGER)
+      || left.name.localeCompare(right.name, 'pt-BR')), [roster]);
+
+  useEffect(() => {
+    if (selectedBuildTeamId && !rankedTeams.some(({ team }) => team.id === selectedBuildTeamId)) setSelectedBuildTeamId('');
+  }, [rankedTeams, selectedBuildTeamId]);
 
   const ownedBuilds = roster
     .map(getCharacter)
@@ -958,10 +1041,27 @@ export default function App() {
         <section className="recommendations-section" id="recommendations">
           <div className="section-heading">
             <div><div className="section-kicker">TRAÇANDO A ROTA <span>✧</span></div><h2>Times para explorar</h2><p>Ideias de composição com alternativas conforme o seu elenco.</p></div>
-            <div className="recommendation-count"><strong>{String(teams.length).padStart(2, '0')}</strong><span>ROTAS<br />SUGERIDAS</span></div>
+            <div className="recommendation-count"><strong>{String(rankedTeams.length).padStart(2, '0')}</strong><span>ROTAS<br />SUGERIDAS</span></div>
           </div>
           <div className="roster-notice"><div className="notice-icon">✧</div><div><strong>{roster.length ? `${roster.length} personagens no seu elenco` : 'Primeiro, marque quem você já tem'}</strong><span>{roster.length ? 'Os times estão ordenados pelos que você consegue montar; substitutos e posições em falta ficam indicados.' : 'Marque seus personagens para ordenar os times por compatibilidade e ver quem pode substituir quem.'}</span></div><button onClick={() => goTo(navItems[1])}>{roster.length ? 'Editar elenco' : 'Selecionar elenco'} <span>→</span></button></div>
-          <div className="team-grid">{rankedTeams.map(({ team, evaluation }) => <TeamCard key={team.id} team={team} roster={roster} evaluation={evaluation} onEditRoster={() => goTo(navItems[1])} onOpenBuilds={() => goTo(navItems[2])} />)}</div>
+          {roster.length > 0 && <div className="team-focus-control"><label htmlFor="team-focus-character">Montar com foco em<select id="team-focus-character" value={teamFocusCharacterId} onChange={(event) => setTeamFocusCharacterId(event.target.value)}><option value="">Qualquer personagem</option>{focusCharacters.map((character) => <option key={character.id} value={character.id}>{character.name}</option>)}</select></label><span>{teamFocusCharacterId ? 'Mostrando apenas composições cadastradas que incluem este personagem.' : 'Escolha alguém do seu elenco para encontrar composições onde essa pessoa participa.'}</span></div>}
+          {selectedBuildTeamId ? (() => {
+            const selected = rankedTeams.find(({ team }) => team.id === selectedBuildTeamId);
+            return selected && <TeamBuildWorkspace
+              team={selected.team}
+              evaluation={selected.evaluation}
+              selectedCharacterId={selectedTeamBuildCharacters[selected.team.id]}
+              onSelectCharacter={selectTeamBuildCharacter}
+              onBack={() => { setSelectedBuildTeamId(''); window.setTimeout(() => document.getElementById('recommendations')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0); }}
+              ownedWeapons={ownedWeapons}
+              goals={goals}
+              onToggleWeapon={toggleWeapon}
+              onAddBuildGoal={addBuildGoal}
+              onOpenBuilds={() => goTo(navItems[2])}
+            />;
+          })() : rankedTeams.length > 0
+            ? <div className="team-grid">{rankedTeams.map(({ team, evaluation }) => <TeamCard key={team.id} team={team} roster={roster} evaluation={evaluation} focusCharacterId={teamFocusCharacterId} onEditRoster={() => goTo(navItems[1])} onOpenTeamBuilds={openTeamBuilds} />)}</div>
+            : <div className="empty-state team-focus-empty"><strong>Ainda não há um time cadastrado com {getCharacter(teamFocusCharacterId)?.name}.</strong><p>Os guias atuais cobrem algumas composições iniciais. Limpe o foco para ver todos os times ou escolha outro personagem do elenco.</p><button type="button" onClick={() => setTeamFocusCharacterId('')}>Ver todos os times</button></div>}
           <div className="data-note"><span>ⓘ</span> Builds são uma curadoria inicial baseada nos guias KQM; confirme requisitos de Recarga e ajuste à sua equipe. Algumas trocas alteram a rotação ou o desempenho.</div>
         </section></>}
 

@@ -2,13 +2,22 @@ import { characters } from './data.js';
 
 const getCharacter = (id) => characters.find((character) => character.id === id);
 
-export function evaluateTeam(team, roster) {
-  let best = { lineup: [], coveredCount: -1, coreCount: -1 };
+export function evaluateTeam(team, roster, focusCharacterId = null) {
+  let best = { lineup: [], coveredCount: -1, coreCount: -1, includesFocus: false };
 
   function chooseSlot(index, usedIds, lineup, coveredCount, coreCount) {
     if (index === team.slots.length) {
-      if (coveredCount > best.coveredCount || (coveredCount === best.coveredCount && coreCount > best.coreCount)) {
-        best = { lineup, coveredCount, coreCount };
+      const includesFocus = focusCharacterId
+        ? lineup.some((selection) => selection?.characterId === focusCharacterId)
+        : false;
+      if (
+        (focusCharacterId && includesFocus && !best.includesFocus)
+        || (includesFocus === best.includesFocus && (
+          coveredCount > best.coveredCount
+          || (coveredCount === best.coveredCount && coreCount > best.coreCount)
+        ))
+      ) {
+        best = { lineup, coveredCount, coreCount, includesFocus };
       }
       return;
     }
