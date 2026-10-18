@@ -4,6 +4,7 @@ import { evaluateTeam } from './recommendations.js';
 import { builds, buildSourceName } from './builds.js';
 import { isSupabaseConfigured, supabase } from './lib/supabase.js';
 import { enkaAvatarToCharacter, getEnkaCache, saveEnkaCache } from './enka.js';
+import { calculateAscensionMaterials, fetchCharacterAscensionCosts, fetchWeaponAscensionCosts, fetchWeaponNames } from './materials.js';
 
 const STORAGE_KEY = 'teyvat-compass-roster-v1';
 const WEAPON_STORAGE_KEY = 'teyvat-compass-weapons-v1';
@@ -50,6 +51,13 @@ const pageFromHash = (hash) => {
 
 function CompassMark({ small = false }) {
   return <span className={`compass-mark${small ? ' compass-mark--small' : ''}`} aria-hidden="true"><i>✦</i></span>;
+}
+
+function MaterialItemIcon({ item }) {
+  const [failed, setFailed] = useState(false);
+  return failed || !item.imageUrl
+    ? <span className="material-item-icon material-item-icon--fallback" aria-hidden="true">{item.id === 202 ? '◈' : '✧'}</span>
+    : <span className="material-item-icon"><img src={item.imageUrl} alt="" loading="lazy" onError={() => setFailed(true)} /></span>;
 }
 
 function CharacterToken({ character, compact = false }) {
@@ -440,12 +448,50 @@ export default function App() {
   const [enkaBusy, setEnkaBusy] = useState(false);
   const [enkaMessage, setEnkaMessage] = useState('');
   const [enkaError, setEnkaError] = useState('');
+  const [materialCharacterId, setMaterialCharacterId] = useState('');
+  const [materialPlanType, setMaterialPlanType] = useState('character');
+  const [weaponNames, setWeaponNames] = useState([]);
+  const [selectedMaterialWeapon, setSelectedMaterialWeapon] = useState('');
+  const [weaponListLoading, setWeaponListLoading] = useState(false);
+  const [weaponListError, setWeaponListError] = useState('');
+  const [weaponListRetry, setWeaponListRetry] = useState(0);
+  const [materialCurrentLevel, setMaterialCurrentLevel] = useState(1);
+  const [materialTargetLevel, setMaterialTargetLevel] = useState(90);
+  const [ascensionCosts, setAscensionCosts] = useState(null);
+  const [ascensionLoading, setAscensionLoading] = useState(false);
+  const [ascensionError, setAscensionError] = useState('');
+  const [ascensionRetry, setAscensionRetry] = useState(0);
+  const materialCharacters = useMemo(() => roster.map(getCharacter).filter((character) => character?.avatarId), [roster]);
+  const selectedMaterialCharacter = materialCharacters.find((character) => character.id === materialCharacterId) || materialCharacters[0];
+  const selectedMaterialName = materialPlanType === 'weapon' ? selectedMaterialWeapon : selectedMaterialCharacter?.name;
 
   useEffect(() => {
     const syncPageFromHash = () => setActiveNav(pageFromHash(window.location.hash));
     window.addEventListener('popstate', syncPageFromHash);
     return () => window.removeEventListener('popstate', syncPageFromHash);
   }, []);
+
+  useEffect(() => {
+    if (!materialCharacters.some((character) => character.id === materialCharacterId)) {
+      setMaterialCharacterId(materialCharacters[0]?.id || '');
+    }
+  }, [materialCharacters, materialCharacterId]);
+
+  useEffect(() => {
+    if (materialPlanType !== 'weapon' || weaponNames.length) return undefined;
+    let active = true;
+    setWeaponListLoading(true);
+    setWeaponListError('');
+    fetchWeaponNames()
+      .then((names) => {
+        if (!active) return;
+        setWeaponNames(names);
+        setSelectedMaterialWeapon((current) => current || names[0] || '');
+      })
+      .catch((error) => { if (active) setWeaponListError(error.message || 'Não foi possível carregar as armas.'); })
+      .finally(() => { if (active) setWeaponListLoading(false); });
+    return () => { active = false; };
+  }, [materialPlanType, weaponListRetry]);
 
   useEffect(() => {
     if (!supabase) return undefined;
@@ -466,6 +512,28 @@ export default function App() {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    const character = materialPlanType === 'character'
+      ? characters.find((entry) => entry.id === materialCharacterId && entry.avatarId)
+      : null;
+    if (materialPlanType === 'character' && !character || materialPlanType === 'weapon' && !selectedMaterialWeapon) {
+      setAscensionCosts(null);
+      setAscensionError('');
+      return undefined;
+    }
+    let active = true;
+    setAscensionCosts(null);
+    setAscensionError('');
+    setAscensionLoading(true);
+    (materialPlanType === 'character'
+      ? fetchCharacterAscensionCosts(character)
+      : fetchWeaponAscensionCosts(selectedMaterialWeapon))
+      .then((costs) => { if (active) setAscensionCosts(costs); })
+      .catch((error) => { if (active) setAscensionError(error.message || 'Falha ao consultar materiais.'); })
+      .finally(() => { if (active) setAscensionLoading(false); });
+    return () => { active = false; };
+  }, [materialPlanType, materialCharacterId, selectedMaterialWeapon, ascensionRetry]);
 
   useEffect(() => {
     if (!supabase || !session?.user?.id) {
@@ -797,6 +865,13 @@ export default function App() {
   const ownedCharactersWithoutBuilds = roster
     .map(getCharacter)
     .filter((character) => character && !builds[character.id]);
+  const ascensionMaterials = useMemo(() => ascensionCosts
+    ? calculateAscensionMaterials(ascensionCosts, materialCurrentLevel, materialTargetLevel)
+    : [], [ascensionCosts, materialCurrentLevel, materialTargetLevel]);
+  const materialGoalTitle = selectedMaterialName
+    ? `Ascender ${materialPlanType === 'weapon' ? `arma ${selectedMaterialWeapon}` : selectedMaterialCharacter.name}: nível ${materialCurrentLevel} → ${materialTargetLevel}`
+    : '';
+  const hasMaterialGoal = goals.some((goal) => goal.category === 'materials' && goal.title === materialGoalTitle && goal.progress < goal.target);
   const showcaseEntries = enkaShowcase?.avatars || [];
   const selectedShowcaseEntry = showcaseEntries.find((entry) => entry.characterId === selectedShowcaseCharacterId) || showcaseEntries[0];
 
@@ -812,6 +887,29 @@ export default function App() {
     setActiveNav(item.label);
     if (window.location.hash !== `#${item.target}`) window.history.pushState(null, '', `#${item.target}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const addAscensionGoal = () => {
+    if (!selectedMaterialName || !ascensionMaterials.length || hasMaterialGoal) return;
+    const checklist = ascensionMaterials.map((item) => ({
+      id: `material-${item.id}`,
+      label: `Juntar ${item.count} × ${item.name}`,
+      imageUrl: item.imageUrl,
+      materialId: item.id,
+      done: false,
+    }));
+    setGoals((current) => [{
+      id: crypto.randomUUID(),
+      title: materialGoalTitle,
+      category: 'materials',
+      ...(materialPlanType === 'character' ? { characterId: selectedMaterialCharacter.id } : {}),
+      progress: 0,
+      target: checklist.length,
+      checklist,
+      createdAt: new Date().toISOString(),
+    }, ...current]);
+    goTo(navItems[0]);
+    window.setTimeout(() => document.getElementById('my-goals')?.scrollIntoView({ behavior: 'smooth' }), 0);
   };
 
   return (
@@ -927,6 +1025,29 @@ export default function App() {
             {ownedCharactersWithoutBuilds.length > 0 && ownedBuilds.length > 0 && <p className="builds-coverage-note"><strong>Ainda sem guia</strong><span>{ownedCharactersWithoutBuilds.map((character) => character.name).join(', ')}. A cobertura do catálogo será ampliada aos poucos.</span></p>}
           </>}
 
+          <section className="ascension-planner" aria-labelledby="ascension-planner-title">
+            <div className="section-heading ascension-planner-heading"><div><div className="section-kicker">MATERIAIS <span>✧</span></div><h2 id="ascension-planner-title">Planejar ascensão</h2><p>Calcule materiais e Mora para subir personagens ou armas.</p></div></div>
+            <div className="ascension-type-switch" role="group" aria-label="Tipo de ascensão">
+              <button type="button" className={materialPlanType === 'character' ? 'is-active' : ''} aria-pressed={materialPlanType === 'character'} onClick={() => setMaterialPlanType('character')}>Personagem</button>
+              <button type="button" className={materialPlanType === 'weapon' ? 'is-active' : ''} aria-pressed={materialPlanType === 'weapon'} onClick={() => setMaterialPlanType('weapon')}>Arma</button>
+            </div>
+            {materialPlanType === 'character' && !materialCharacters.length ? <div className="empty-state ascension-empty-state"><strong>Selecione personagens para calcular</strong><p>O planejador de armas pode ser usado sem preencher o elenco.</p><button className="primary-button" onClick={() => goTo(navItems[1])}>Ir para Personagens <span>→</span></button></div> : <>
+              <div className="ascension-controls">
+                {materialPlanType === 'character'
+                  ? <label><span>Personagem</span><select value={selectedMaterialCharacter?.id || ''} onChange={(event) => setMaterialCharacterId(event.target.value)}>{materialCharacters.map((character) => <option key={character.id} value={character.id}>{character.name}</option>)}</select></label>
+                  : <label><span>Arma</span><select value={selectedMaterialWeapon} onChange={(event) => setSelectedMaterialWeapon(event.target.value)} disabled={weaponListLoading || !weaponNames.length}>{weaponListLoading ? <option>Carregando armas…</option> : weaponNames.map((name) => <option key={name} value={name}>{name}</option>)}</select></label>}
+                <label><span>Nível atual</span><input type="number" min="1" max="90" value={materialCurrentLevel} onChange={(event) => setMaterialCurrentLevel(Math.min(90, Math.max(1, Number(event.target.value) || 1)))} /></label>
+                <span className="ascension-arrow" aria-hidden="true">→</span>
+                <label><span>Nível desejado</span><input type="number" min="1" max="90" value={materialTargetLevel} onChange={(event) => setMaterialTargetLevel(Math.min(90, Math.max(1, Number(event.target.value) || 1)))} /></label>
+              </div>
+              {weaponListError && materialPlanType === 'weapon' ? <p className="ascension-message ascension-message--error" role="alert">{weaponListError} <button className="ascension-retry" type="button" onClick={() => setWeaponListRetry((count) => count + 1)}>Tentar novamente</button></p> : materialCurrentLevel >= materialTargetLevel ? <p className="ascension-message">Escolha um nível desejado maior que o atual.</p> : ascensionLoading || weaponListLoading ? <p className="ascension-message" role="status">Consultando materiais…</p> : ascensionError ? <p className="ascension-message ascension-message--error" role="alert">{ascensionError} <button className="ascension-retry" type="button" onClick={() => setAscensionRetry((count) => count + 1)}>Tentar novamente</button></p> : ascensionCosts && ascensionMaterials.length ? <>
+                <div className="ascension-material-list">{ascensionMaterials.map((item) => <article className={item.id === 202 ? 'ascension-material ascension-material--mora' : 'ascension-material'} key={item.id}><MaterialItemIcon item={item} /><div><strong>{item.name}</strong><small>{item.id === 202 ? 'Moeda' : 'Material de ascensão'}</small></div><b>× {item.count.toLocaleString('pt-BR')}</b></article>)}</div>
+                <button className="ascension-goal-action" type="button" onClick={addAscensionGoal} disabled={hasMaterialGoal}>{hasMaterialGoal ? '✓ Meta já está no Meu plano' : '＋ Acompanhar materiais no Meu plano'}</button>
+              </> : ascensionCosts ? <p className="ascension-message">Esse intervalo não cruza um limite de ascensão. EXP de personagem e materiais de talento não estão incluídos.</p> : null}
+              <p className="ascension-attribution">Inclui materiais de ascensão e Mora; EXP e materiais de talento não estão incluídos. Fonte: <a href="https://github.com/theBowja/genshin-db" target="_blank" rel="noreferrer">Genshin-DB ↗</a>. Consulta pública em português, armazenada neste navegador por 7 dias.</p>
+            </>}
+          </section>
+
           {enkaShowcase?.avatars?.length > 0 && <details className="showcase-imported-disclosure">
             <summary>Ver builds importadas do Showcase · {enkaShowcase.avatars.length} personagens</summary>
             <section className="showcase-imported">
@@ -969,8 +1090,8 @@ export default function App() {
             const complete = progress >= target;
             const percentage = target ? Math.round((progress / target) * 100) : 0;
             return <article className={`goal-card${complete ? ' goal-card--complete' : ''}`} key={goal.id}>
-              <div className="goal-card-heading"><div><span className="goal-category">{{ character: 'PERSONAGEM', weapon: 'ARMA', artifacts: 'ARTEFATOS', exploration: 'EXPLORAÇÃO', build: 'BUILD', other: 'OUTRO' }[goal.category] || 'OBJETIVO'}</span><h3>{goal.title}</h3>{character && <small>{character.name}</small>}</div><button type="button" className="goal-remove" aria-label={`Remover objetivo: ${goal.title}`} onClick={() => setGoals((current) => current.filter((item) => item.id !== goal.id))}>×</button></div>
-              {hasChecklist && <div className="goal-checklist">{goal.checklist.map((task) => <label className={task.done ? 'goal-task goal-task--done' : 'goal-task'} key={task.id}><input type="checkbox" checked={task.done} onChange={() => toggleGoalTask(goal.id, task.id)} /><span>{task.label}</span></label>)}</div>}
+              <div className="goal-card-heading"><div><span className="goal-category">{{ character: 'PERSONAGEM', weapon: 'ARMA', artifacts: 'ARTEFATOS', exploration: 'EXPLORAÇÃO', build: 'BUILD', materials: 'MATERIAIS', other: 'OUTRO' }[goal.category] || 'OBJETIVO'}</span><h3>{goal.title}</h3>{character && <small>{character.name}</small>}</div><button type="button" className="goal-remove" aria-label={`Remover objetivo: ${goal.title}`} onClick={() => setGoals((current) => current.filter((item) => item.id !== goal.id))}>×</button></div>
+              {hasChecklist && <div className="goal-checklist">{goal.checklist.map((task) => <label className={task.done ? 'goal-task goal-task--done' : 'goal-task'} key={task.id}><input type="checkbox" checked={task.done} onChange={() => toggleGoalTask(goal.id, task.id)} />{task.imageUrl && <MaterialItemIcon item={{ id: task.materialId, imageUrl: task.imageUrl }} />}<span>{task.label}</span></label>)}</div>}
               <div className="goal-progress-track" role="progressbar" aria-label={`Progresso de ${goal.title}`} aria-valuenow={progress} aria-valuemin="0" aria-valuemax={target}><span style={{ width: `${percentage}%` }} /></div>
               <div className="goal-card-footer"><span>{complete ? 'Concluído' : `${progress} de ${target}`} · {percentage}%</span>{!hasChecklist && <div><button type="button" onClick={() => changeGoalProgress(goal.id, -1)} disabled={goal.progress === 0} aria-label="Diminuir progresso">−</button><button type="button" onClick={() => changeGoalProgress(goal.id, 1)} disabled={complete} aria-label="Aumentar progresso">＋</button></div>}</div>
             </article>;
