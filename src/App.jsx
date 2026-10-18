@@ -33,6 +33,11 @@ const readEnkaShowcase = () => {
     return null;
   }
 };
+const pageFromHash = (hash) => {
+  if (hash === '#characters' || hash === '#character-library') return 'Personagens';
+  if (hash === '#builds') return 'Builds';
+  return 'Meu plano';
+};
 
 function CompassMark({ small = false }) {
   return <span className={`compass-mark${small ? ' compass-mark--small' : ''}`} aria-hidden="true"><i>✦</i></span>;
@@ -144,7 +149,7 @@ function AccountMenu({ session, profileStatus, profileFeedback }) {
   );
 }
 
-function TeamCard({ team, roster, evaluation, ownedWeapons, onToggleWeapon }) {
+function TeamCard({ team, roster, evaluation, onEditRoster, onOpenBuilds }) {
   const complete = evaluation.coveredCount === team.slots.length;
   const missingSlots = team.slots.filter((slot, index) => !evaluation.lineup[index]);
   const assignedIds = new Set(evaluation.lineup.filter(Boolean).map((selection) => selection.characterId));
@@ -181,36 +186,7 @@ function TeamCard({ team, roster, evaluation, ownedWeapons, onToggleWeapon }) {
           );
         })}
       </div>
-      <details className="team-builds">
-        <summary>Builds recomendadas para este time <span>↓</span></summary>
-        <p className="builds-context">Marque as armas que você tem. As suas aparecem primeiro; recomendações variam conforme equipe e rotação.</p>
-        <div className="team-build-list">
-          {team.slots.map((slot, index) => {
-            const character = evaluation.lineup[index]?.character || getCharacter(slot.characterId);
-            const build = builds[character?.id];
-            if (!character || !build) return null;
-            return <article className="character-build" key={`${team.id}-${character.id}`}>
-              <div className="character-build-heading"><span style={{ '--character-color': character.color }}>{character.initials}</span><div><strong>{character.name}</strong><small>{build.style}</small></div></div>
-              <div className="build-weapon-detail">
-                <b>Armas recomendadas</b>
-                <div className="weapon-options">
-                  {build.weapons
-                    .map((weapon, rank) => ({ weapon, rank, owned: ownedWeapons.includes(weapon) }))
-                    .sort((a, b) => Number(b.owned) - Number(a.owned) || a.rank - b.rank)
-                    .map(({ weapon, owned }) => <button key={weapon} className={`weapon-option${owned ? ' weapon-option--owned' : ''}`} aria-pressed={owned} onClick={() => onToggleWeapon(weapon)}>
-                      <span>{owned ? '✓ Tenho' : '+ Marcar'}</span>{weapon}
-                    </button>)}
-                </div>
-              </div>
-              <div className="build-detail"><b>Artefatos</b><span>{build.artifacts.join(' · ')}</span></div>
-              <div className="build-detail"><b>Atributos principais</b><span>{build.mainStats}</span></div>
-              <div className="build-detail"><b>Subatributos</b><span>{build.substats}</span></div>
-              <p className="build-note">{build.note}</p>
-              <a className="build-source" href={build.source} target="_blank" rel="noreferrer">Fonte: {buildSourceName} ↗</a>
-            </article>;
-          })}
-        </div>
-      </details>
+      <button className="team-build-action" type="button" onClick={onOpenBuilds}>Ver recomendações de build <span>→</span></button>
       <div className="team-explanation">
         <span className="explanation-icon">✧</span>
         <div>
@@ -228,7 +204,7 @@ function TeamCard({ team, roster, evaluation, ownedWeapons, onToggleWeapon }) {
         </div>
       </div>
       {roster.length > 0 && <div className="match-summary">{evaluation.coreCount} personagem{evaluation.coreCount === 1 ? '' : 's'} principal{evaluation.coreCount === 1 ? '' : 'is'} · {evaluation.alternativeCount} substituto{evaluation.alternativeCount === 1 ? '' : 's'} · {evaluation.missingCount} vaga{evaluation.missingCount === 1 ? '' : 's'}</div>}
-      <button className="team-action" onClick={() => document.getElementById('character-library')?.scrollIntoView({ behavior: 'smooth' })}>
+      <button className="team-action" onClick={onEditRoster}>
         {missingSlots.length ? 'Ver opções para completar' : 'Editar meu elenco'} <span>→</span>
       </button>
     </article>
@@ -236,6 +212,28 @@ function TeamCard({ team, roster, evaluation, ownedWeapons, onToggleWeapon }) {
 }
 
 const getCharacter = (id) => characters.find((character) => character.id === id);
+
+function CharacterBuildCard({ character, build, ownedWeapons, onToggleWeapon }) {
+  return <article className="character-build">
+    <div className="character-build-heading"><span style={{ '--character-color': character.color }}>{character.initials}</span><div><strong>{character.name}</strong><small>{build.style}</small></div></div>
+    <div className="build-weapon-detail">
+      <b>Armas recomendadas</b>
+      <div className="weapon-options">
+        {build.weapons
+          .map((weapon, rank) => ({ weapon, rank, owned: ownedWeapons.includes(weapon) }))
+          .sort((a, b) => Number(b.owned) - Number(a.owned) || a.rank - b.rank)
+          .map(({ weapon, owned }) => <button key={weapon} className={`weapon-option${owned ? ' weapon-option--owned' : ''}`} aria-pressed={owned} onClick={() => onToggleWeapon(weapon)}>
+            <span>{owned ? '✓ Tenho' : '+ Marcar'}</span>{weapon}
+          </button>)}
+      </div>
+    </div>
+    <div className="build-detail"><b>Artefatos</b><span>{build.artifacts.join(' · ')}</span></div>
+    <div className="build-detail"><b>Atributos principais</b><span>{build.mainStats}</span></div>
+    <div className="build-detail"><b>Subatributos</b><span>{build.substats}</span></div>
+    <p className="build-note">{build.note}</p>
+    <a className="build-source" href={build.source} target="_blank" rel="noreferrer">Fonte: {buildSourceName} ↗</a>
+  </article>;
+}
 const statLabels = {
   FIGHT_PROP_HP: 'Vida', FIGHT_PROP_ATTACK: 'ATQ', FIGHT_PROP_DEFENSE: 'DEF',
   FIGHT_PROP_HP_PERCENT: 'Vida%', FIGHT_PROP_ATTACK_PERCENT: 'ATQ%', FIGHT_PROP_DEFENSE_PERCENT: 'DEF%',
@@ -265,6 +263,77 @@ const artifactSlotNames = {
   EQUIP_BRACER: 'Flor', EQUIP_NECKLACE: 'Pluma', EQUIP_SHOES: 'Areia',
   EQUIP_RING: 'Cálice', EQUIP_DRESS: 'Tiara',
 };
+const normalizeBuildLabel = (value) => {
+  const normalized = String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').replace(/[^a-z0-9]/g, '');
+  return normalized === 'taxa' ? 'taxacrit' : normalized;
+};
+const buildMainStatLabels = {
+  FIGHT_PROP_HP: 'Vida', FIGHT_PROP_ATTACK: 'ATQ', FIGHT_PROP_DEFENSE: 'DEF',
+  FIGHT_PROP_HP_PERCENT: 'Vida%', FIGHT_PROP_ATTACK_PERCENT: 'ATQ%', FIGHT_PROP_DEFENSE_PERCENT: 'DEF%',
+  FIGHT_PROP_CRITICAL: 'Taxa CRIT', FIGHT_PROP_CRITICAL_HURT: 'Dano CRIT',
+  FIGHT_PROP_CHARGE_EFFICIENCY: 'Recarga', FIGHT_PROP_ELEMENT_MASTERY: 'Proficiência Elemental',
+  FIGHT_PROP_HEAL_ADD: 'Bônus de Cura', FIGHT_PROP_PHYSICAL_ADD_HURT: 'Bônus de Dano Físico',
+  FIGHT_PROP_FIRE_ADD_HURT: 'Bônus de Dano Pyro', FIGHT_PROP_ELEC_ADD_HURT: 'Bônus de Dano Electro',
+  FIGHT_PROP_WATER_ADD_HURT: 'Bônus de Dano Hydro', FIGHT_PROP_WIND_ADD_HURT: 'Bônus de Dano Anemo',
+  FIGHT_PROP_ICE_ADD_HURT: 'Bônus de Dano Cryo', FIGHT_PROP_ROCK_ADD_HURT: 'Bônus de Dano Geo',
+  FIGHT_PROP_GRASS_ADD_HURT: 'Bônus de Dano Dendro',
+};
+const buildMainSlots = { EQUIP_SHOES: 0, EQUIP_RING: 1, EQUIP_DRESS: 2 };
+
+function compareBuild(entry, recommendation) {
+  const priorities = [];
+  const weaponName = entry.weapon?.name;
+  const weaponMatches = Boolean(weaponName && recommendation.weapons.some((name) => normalizeBuildLabel(name) === normalizeBuildLabel(weaponName)));
+  if (!weaponName) priorities.push('Arma não encontrada no Showcase; confira o equipamento no jogo.');
+  else if (!weaponMatches) priorities.push(`Compare a arma atual (${weaponName}) com as opções recomendadas.`);
+
+  const artifacts = entry.artifacts || [];
+  const setCounts = new Map();
+  artifacts.forEach((artifact) => {
+    if (artifact.setName) setCounts.set(artifact.setName, (setCounts.get(artifact.setName) || 0) + 1);
+  });
+  const namedSetRecommendations = recommendation.artifacts.map((line) => {
+    const candidate = line.split('(')[0].split(/\s+\+\s+/)[0].replace(/^\s*\d+\s*peças?\s+de\s+/i, '').trim();
+    if (!candidate || /^(atq|vida|def|recarga|dano|proficiência|crit|taxa|bônus)/i.test(candidate)) return null;
+    const required = /2\s*(?:\+\s*2\s*)?peças/i.test(line) ? 2 : /4\s*peças/i.test(line) ? 4 : 2;
+    return { setName: candidate, required };
+  }).filter(Boolean);
+  const setComparisons = namedSetRecommendations.map(({ setName, required }) => {
+    const match = [...setCounts].find(([equippedName]) => normalizeBuildLabel(equippedName).includes(normalizeBuildLabel(setName)) || normalizeBuildLabel(setName).includes(normalizeBuildLabel(equippedName)));
+    const equippedName = match?.[0] || setName;
+    const count = match?.[1] || 0;
+    return { setName, equippedName, count, required, met: count >= required };
+  });
+  const hasNamedSetRecommendations = namedSetRecommendations.length > 0;
+  if (hasNamedSetRecommendations && !setComparisons.some(({ met }) => met)) {
+    priorities.push('Confira os conjuntos: nenhum conjunto reconhecido completa a recomendação do guia.');
+  }
+
+  const mainStatGroups = recommendation.mainStats.split('/').map((group) => group.trim());
+  const mainStatChecks = Object.entries(buildMainSlots).map(([slot, index]) => {
+    const artifact = artifacts.find((item) => item.slot === slot);
+    const actual = artifact?.mainStat;
+    const actualLabel = buildMainStatLabels[actual?.propId] || actual?.label;
+    const expected = (mainStatGroups[index] || '').split(/\s+ou\s+|,\s*/i).map((value) => value.trim()).filter(Boolean);
+    const matches = Boolean(actualLabel && expected.some((value) => normalizeBuildLabel(value) === normalizeBuildLabel(actualLabel)));
+    if (actualLabel && expected.length && !matches) priorities.push(`Confira a ${artifactSlotNames[slot].toLocaleLowerCase('pt-BR')}: está com ${actualLabel}; o guia sugere ${expected.join(' ou ')}.`);
+    return { slot, actualLabel, expected, matches };
+  });
+
+  const equippedSubstats = artifacts.flatMap((artifact) => artifact.substats || []);
+  const substatTargets = [
+    { label: 'CRIT', matches: (stat) => ['FIGHT_PROP_CRITICAL', 'FIGHT_PROP_CRITICAL_HURT'].includes(stat.propId) },
+    { label: 'Recarga', matches: (stat) => stat.propId === 'FIGHT_PROP_CHARGE_EFFICIENCY' },
+    { label: 'ATQ%', matches: (stat) => stat.propId === 'FIGHT_PROP_ATTACK_PERCENT' },
+    { label: 'Proficiência Elemental', matches: (stat) => stat.propId === 'FIGHT_PROP_ELEMENT_MASTERY' },
+    { label: 'Vida%', matches: (stat) => stat.propId === 'FIGHT_PROP_HP_PERCENT' },
+    { label: 'DEF%', matches: (stat) => stat.propId === 'FIGHT_PROP_DEFENSE_PERCENT' },
+  ].filter(({ label }) => normalizeBuildLabel(recommendation.substats).includes(normalizeBuildLabel(label)))
+    .map((target) => ({ ...target, found: equippedSubstats.some(target.matches) }));
+  substatTargets.filter(({ found, label }) => !found).forEach(({ label }) => priorities.push(`Nenhuma peça mostra subatributo de ${label}; o guia o prioriza.`));
+
+  return { priorities, weaponMatches, setCounts: [...setCounts], setComparisons, hasNamedSetRecommendations, mainStatChecks, substatTargets };
+}
 
 function ShowcaseBuildCard({ entry }) {
   const character = getCharacter(entry.characterId);
@@ -282,47 +351,57 @@ function ShowcaseBuildCard({ entry }) {
   };
   const iconUrl = (icon) => icon ? `https://enka.network/ui/${encodeURIComponent(icon)}.png` : '';
   const weapon = entry.weapon;
+  const comparison = recommendation ? compareBuild(entry, recommendation) : null;
 
   return <article className="showcase-build-card">
-    <div className="showcase-character-heading">
-      <span style={{ '--character-color': character.color }}>{character.initials}</span>
-      <div><strong>{character.name}</strong><small>Nv. {entry.level ?? '?'} · C{entry.constellation ?? 0}</small></div>
-    </div>
+    <header className="showcase-card-header">
+      {character.iconUrl && <img src={character.iconUrl} alt="" loading="lazy" />}
+      <div className="showcase-character-heading"><div><strong>{character.name}</strong><small>Nível {entry.level ?? '?'} · C{entry.constellation ?? 0}{recommendation ? ` · ${recommendation.style}` : ''}</small></div></div>
+      {recommendation && <span className={`showcase-card-status${comparison.weaponMatches && comparison.priorities.length === 0 ? ' showcase-card-status--good' : ''}`}>{comparison.priorities.length ? `${comparison.priorities.length} prioridades` : 'Build conferida'}</span>}
+    </header>
     <div className="showcase-current-stats">
       {stats.map(([label, value, percentage]) => <div key={label}><span>{label}</span><strong>{formatCombatStat(Number(value) || 0, percentage)}</strong></div>)}
     </div>
-    <div className="showcase-compare">
-      <section className="showcase-equipment">
-        <h4>Equipado no Showcase</h4>
-        {weapon ? <div className="showcase-weapon">
-          {weapon.icon && <img src={iconUrl(weapon.icon)} alt="Ícone da arma equipada" loading="lazy" />}
-          <div><strong>{weapon.name || 'Arma equipada'}</strong><span>Nv. {weapon.level ?? '?'} · R{weapon.refinement ?? '?'}</span>
-            {weapon.stats?.map((stat, index) => <small key={`${stat.propId}-${index}`}>{gearStatName(stat)} {gearStatValue(stat)}</small>)}
-          </div>
-        </div> : <p className="showcase-no-data">Arma não informada no Showcase.</p>}
-        <div className="showcase-artifacts">
-          {entry.artifacts?.map((artifact) => <div className="showcase-artifact" key={artifact.id} title={`${artifactSlotNames[artifact.slot] || 'Artefato'} · Nv. ${artifact.level ?? '?'}`}>
-            {artifact.icon && <img src={iconUrl(artifact.icon)} alt={`Ícone: ${artifactSlotNames[artifact.slot] || 'artefato'}`} loading="lazy" />}
+    <section className="showcase-gear-section">
+      <h4>Equipamentos atuais</h4>
+      {weapon ? <div className={`showcase-weapon${comparison?.weaponMatches ? ' showcase-weapon--match' : ''}`}>
+        {weapon.icon && <img src={iconUrl(weapon.icon)} alt="Ícone da arma equipada" loading="lazy" />}
+        <div><strong>{weapon.name || 'Arma equipada'}</strong><span>Nível {weapon.level ?? '?'} · Refinamento {weapon.refinement ?? '?'}</span>
+          {weapon.stats?.map((stat, index) => <small key={`${stat.propId}-${index}`}>{gearStatName(stat)} {gearStatValue(stat)}</small>)}
+        </div>
+      </div> : <p className="showcase-no-data">Arma não informada no Showcase.</p>}
+      <div className="showcase-artifacts">
+        {entry.artifacts?.map((artifact) => {
+          const setComparison = comparison?.setComparisons.find((item) => item.equippedName === artifact.setName);
+          return <div className={`showcase-artifact${setComparison?.met ? ' showcase-artifact--match' : ''}`} key={artifact.id} title={`${artifactSlotNames[artifact.slot] || 'Artefato'} · Nv. ${artifact.level ?? '?'}`}>
+            {artifact.icon && <img src={iconUrl(artifact.icon)} alt="" loading="lazy" />}
             <div><strong>{artifactSlotNames[artifact.slot] || 'Artefato'} +{Math.max(0, (artifact.level ?? 1) - 1)}</strong>
               {(artifact.setName || artifact.name) && <span>{artifact.setName || artifact.name}</span>}
-              {artifact.mainStat && <span>{gearStatName(artifact.mainStat)} {gearStatValue(artifact.mainStat)}</span>}
+              {artifact.mainStat && <span className="artifact-main-stat">{gearStatName(artifact.mainStat)} {gearStatValue(artifact.mainStat)}</span>}
               {artifact.substats?.map((stat, index) => <small key={`${stat.propId}-${index}`}>{gearStatName(stat)} {gearStatValue(stat)}</small>)}
             </div>
-          </div>)}
-          {!entry.artifacts?.length && <p className="showcase-no-data">Artefatos não informados no Showcase.</p>}
-        </div>
-      </section>
-      <section className="showcase-recommendation">
-        <h4>Recomendação Teyvat Compass</h4>
-        {recommendation ? <>
-          <strong>{recommendation.weapons.join(' · ')}</strong>
-          <span>{recommendation.artifacts.join(' · ')}</span>
-          <small><b>Atributos principais:</b> {recommendation.mainStats}</small>
-          <small><b>Priorize:</b> {recommendation.substats}</small>
-          <a href={recommendation.source} target="_blank" rel="noreferrer">Consultar guia KQM ↗</a>
-        </> : <p className="showcase-no-data">Ainda não há recomendação cadastrada para este personagem.</p>}
-      </section>
-    </div>
+          </div>;
+        })}
+        {!entry.artifacts?.length && <p className="showcase-no-data">Artefatos não informados no Showcase.</p>}
+      </div>
+    </section>
+    <section className="showcase-recommendation">
+      <h4>Build recomendada</h4>
+      {recommendation ? <>
+        <div className="build-match-status"><span className={comparison.weaponMatches ? 'is-match' : 'needs-review'}>{comparison.weaponMatches ? '✓ Arma dentro das opções recomendadas' : '↗ Confira a arma equipada'}</span><span>{comparison.priorities.length ? `${comparison.priorities.length} pontos para revisar` : 'Sem divergências nos dados comparáveis'}</span></div>
+        <div className="recommendation-row"><b>Armas</b><span>{recommendation.weapons.join(' · ')}</span></div>
+        <div className="recommendation-row"><b>Artefatos</b><span>{recommendation.artifacts.join(' · ')}</span></div>
+        {comparison.setCounts.length > 0 && <div className="recommendation-row"><b>Conjuntos equipados</b><span>{comparison.setCounts.map(([name, count]) => `${name} (${count})`).join(' · ')}</span></div>}
+        {comparison.hasNamedSetRecommendations && <div className="recommendation-row"><b>Comparação de conjuntos</b><span className={comparison.setComparisons.some(({ met }) => met) ? 'build-check--good' : 'build-check--review'}>{comparison.setComparisons.map(({ setName, count, required, met }) => `${setName}: ${count}/${required} ${met ? '✓' : 'para revisar'}`).join(' · ')}</span></div>}
+        {!comparison.hasNamedSetRecommendations && <p className="showcase-compare-note">Este guia usa opções de conjuntos sem nome específico; não há comparação automática de sets.</p>}
+        <div className="recommendation-row"><b>Atributos principais</b><span>{recommendation.mainStats}</span></div>
+        <div className="main-stat-checks">{comparison.mainStatChecks.map(({ slot, actualLabel, expected, matches }) => <span key={slot} className={actualLabel && matches ? 'build-check--good' : actualLabel ? 'build-check--review' : ''}><b>{artifactSlotNames[slot]}:</b> {actualLabel || 'não informado'}{expected.length ? ` · recomendado: ${expected.join(' ou ')}` : ''}</span>)}</div>
+        <div className="recommendation-row"><b>Subatributos prioritários</b><span>{recommendation.substats}</span></div>
+        {comparison.substatTargets.length > 0 && <div className="substat-checks">{comparison.substatTargets.map(({ label, found }) => <span key={label} className={found ? 'build-check--good' : 'build-check--review'}>{found ? '✓' : '↗'} {label}</span>)}</div>}
+        {comparison.priorities.length > 0 && <div className="build-priorities"><b>O que revisar primeiro</b><ul>{comparison.priorities.map((priority) => <li key={priority}>{priority}</li>)}</ul></div>}
+        <a href={recommendation.source} target="_blank" rel="noreferrer">Abrir guia detalhado KQM ↗</a>
+      </> : <p className="showcase-no-data">Ainda não há recomendação cadastrada para este personagem.</p>}
+    </section>
   </article>;
 }
 
@@ -330,18 +409,30 @@ export default function App() {
   const [roster, setRoster] = useState(() => supabase ? [] : readRoster());
   const [ownedWeapons, setOwnedWeapons] = useState(() => supabase ? [] : readOwnedWeapons());
   const [enkaShowcase, setEnkaShowcase] = useState(() => supabase ? null : readEnkaShowcase());
+  const [selectedShowcaseCharacterId, setSelectedShowcaseCharacterId] = useState(null);
   const [session, setSession] = useState(null);
   const [loadedProfileUserId, setLoadedProfileUserId] = useState(null);
   const [profileStatus, setProfileStatus] = useState('local');
   const [profileFeedback, setProfileFeedback] = useState('');
   const [query, setQuery] = useState('');
   const [elementFilter, setElementFilter] = useState('Todos');
+  const [weaponFilter, setWeaponFilter] = useState('Todas');
+  const [rarityFilter, setRarityFilter] = useState('Todas');
+  const [sortOrder, setSortOrder] = useState('region-release');
+  const [pageSize, setPageSize] = useState(48);
+  const [characterPage, setCharacterPage] = useState(1);
   const [ownedOnly, setOwnedOnly] = useState(false);
-  const [activeNav, setActiveNav] = useState('Meu plano');
+  const [activeNav, setActiveNav] = useState(() => pageFromHash(window.location.hash));
   const [enkaUid, setEnkaUid] = useState('');
   const [enkaBusy, setEnkaBusy] = useState(false);
   const [enkaMessage, setEnkaMessage] = useState('');
   const [enkaError, setEnkaError] = useState('');
+
+  useEffect(() => {
+    const syncPageFromHash = () => setActiveNav(pageFromHash(window.location.hash));
+    window.addEventListener('popstate', syncPageFromHash);
+    return () => window.removeEventListener('popstate', syncPageFromHash);
+  }, []);
 
   useEffect(() => {
     if (!supabase) return undefined;
@@ -558,9 +649,31 @@ export default function App() {
   const filteredCharacters = useMemo(() => characters.filter((character) => {
     const matchesQuery = character.name.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'));
     const matchesElement = elementFilter === 'Todos' || character.element === elementFilter;
+    const matchesWeapon = weaponFilter === 'Todas' || character.weapon === weaponFilter;
+    const matchesRarity = rarityFilter === 'Todas' || character.rarity === Number(rarityFilter);
     const matchesOwnership = !ownedOnly || roster.includes(character.id);
-    return matchesQuery && matchesElement && matchesOwnership;
-  }), [query, elementFilter, ownedOnly, roster]);
+    return matchesQuery && matchesElement && matchesWeapon && matchesRarity && matchesOwnership;
+  }).sort((left, right) => {
+    const leftOwned = roster.includes(left.id);
+    const rightOwned = roster.includes(right.id);
+    if (leftOwned !== rightOwned) return leftOwned ? -1 : 1;
+    if (sortOrder === 'region-release') {
+      const regionOrder = ['Mondstadt', 'Liyue', 'Inazuma', 'Sumeru', 'Fontaine', 'Natlan', 'Nod-Krai', 'Snezhnaya', 'Outras regiões'];
+      return regionOrder.indexOf(left.region) - regionOrder.indexOf(right.region)
+        || (left.release ?? Number.MAX_SAFE_INTEGER) - (right.release ?? Number.MAX_SAFE_INTEGER)
+        || left.name.localeCompare(right.name, 'pt-BR');
+    }
+    if (sortOrder === 'release') return (left.release ?? Number.MAX_SAFE_INTEGER) - (right.release ?? Number.MAX_SAFE_INTEGER) || left.name.localeCompare(right.name, 'pt-BR');
+    if (sortOrder === 'rarity') return right.rarity - left.rarity || left.name.localeCompare(right.name, 'pt-BR');
+    return left.name.localeCompare(right.name, 'pt-BR');
+  }), [query, elementFilter, weaponFilter, rarityFilter, sortOrder, ownedOnly, roster]);
+
+  const characterPageCount = Math.max(1, Math.ceil(filteredCharacters.length / pageSize));
+  const visibleCharacters = filteredCharacters.slice((characterPage - 1) * pageSize, characterPage * pageSize);
+
+  useEffect(() => {
+    setCharacterPage(1);
+  }, [query, elementFilter, weaponFilter, rarityFilter, sortOrder, ownedOnly, pageSize]);
 
   const rankedTeams = useMemo(() => teams
     .map((team) => ({ team, evaluation: evaluateTeam(team, roster) }))
@@ -571,25 +684,37 @@ export default function App() {
         || a.team.priority - b.team.priority;
     }), [roster]);
 
+  const ownedBuilds = roster
+    .map(getCharacter)
+    .filter((character) => character && builds[character.id])
+    .sort((left, right) => left.release - right.release || left.name.localeCompare(right.name, 'pt-BR'));
+  const ownedCharactersWithoutBuilds = roster
+    .map(getCharacter)
+    .filter((character) => character && !builds[character.id]);
+  const showcaseEntries = enkaShowcase?.avatars || [];
+  const selectedShowcaseEntry = showcaseEntries.find((entry) => entry.characterId === selectedShowcaseCharacterId) || showcaseEntries[0];
+
   const navItems = [
-    { label: 'Meu plano', icon: '⌂', target: 'top' },
-    { label: 'Personagens', icon: '✧', target: 'character-library' },
+    { label: 'Meu plano', icon: '⌂', target: 'home' },
+    { label: 'Personagens', icon: '✧', target: 'characters' },
+    { label: 'Builds', icon: '⚒', target: 'builds' },
     { label: 'Mapa', icon: '⌖', target: 'map-preview', soon: true },
   ];
 
   const goTo = (item) => {
-    setActiveNav(item.label);
     if (item.soon) return;
-    document.getElementById(item.target)?.scrollIntoView({ behavior: 'smooth' });
+    setActiveNav(item.label);
+    if (window.location.hash !== `#${item.target}`) window.history.pushState(null, '', `#${item.target}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <div className="app-shell" id="top">
+    <div className="app-shell" id="home">
       <aside className="sidebar">
-        <a className="brand" href="#top" onClick={() => setActiveNav('Meu plano')}><CompassMark /><span><strong>TEYVAT</strong><small>COMPASS</small></span></a>
+        <a className="brand" href="#home" onClick={() => goTo(navItems[0])}><CompassMark /><span><strong>TEYVAT</strong><small>COMPASS</small></span></a>
         <div className="sidebar-label">SUA JORNADA</div>
         <nav className="main-nav" aria-label="Navegação principal">
-          {navItems.map((item) => <button key={item.label} className={activeNav === item.label ? 'active' : ''} onClick={() => goTo(item)}><span className="nav-icon">{item.icon}</span>{item.label}{item.soon && <span className="soon-tag">EM BREVE</span>}</button>)}
+          {navItems.map((item) => <button key={item.label} type="button" disabled={item.soon} aria-current={activeNav === item.label ? 'page' : undefined} className={activeNav === item.label ? 'active' : ''} onClick={() => goTo(item)}><span className="nav-icon">{item.icon}</span>{item.label}{item.soon && <span className="soon-tag">EM BREVE</span>}</button>)}
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-orbit" aria-hidden="true"><span>✦</span><i /><b /></div>
@@ -605,12 +730,12 @@ export default function App() {
           <AccountMenu session={session} profileStatus={profileStatus} profileFeedback={profileFeedback} />
         </header>
 
-        <section className="welcome-section">
+        {activeNav === 'Meu plano' && <><section className="welcome-section">
           <div className="welcome-copy">
             <div className="eyebrow"><span /> SEU GUIA DE AVENTURA</div>
             <h1>Encontre seu<br /><em>próximo time.</em></h1>
             <p>Monte uma equipe com quem já caminha ao seu lado.<br className="desktop-break" /> A gente encontra o resto do caminho.</p>
-            <button className="primary-button" onClick={() => document.getElementById('character-library')?.scrollIntoView({ behavior: 'smooth' })}>Escolher meus personagens <span>↓</span></button>
+            <button className="primary-button" onClick={() => goTo(navItems[1])}>Escolher meus personagens <span>→</span></button>
             <div className="welcome-meta"><span><i>✧</i> Sugestões para o seu elenco</span><b>·</b><span>Sem precisar conectar sua conta</span></div>
           </div>
           <div className="welcome-art" aria-hidden="true">
@@ -631,48 +756,97 @@ export default function App() {
             <div><div className="section-kicker">TRAÇANDO A ROTA <span>✧</span></div><h2>Times para explorar</h2><p>Ideias de composição com alternativas conforme o seu elenco.</p></div>
             <div className="recommendation-count"><strong>{String(teams.length).padStart(2, '0')}</strong><span>ROTAS<br />SUGERIDAS</span></div>
           </div>
-          <div className="roster-notice"><div className="notice-icon">✧</div><div><strong>{roster.length ? `${roster.length} personagens no seu elenco` : 'Primeiro, marque quem você já tem'}</strong><span>{roster.length ? 'Os times estão ordenados pelos que você consegue montar; substitutos e posições em falta ficam indicados.' : 'Marque seus personagens para ordenar os times por compatibilidade e ver quem pode substituir quem.'}</span></div><button onClick={() => document.getElementById('character-library')?.scrollIntoView({ behavior: 'smooth' })}>{roster.length ? 'Editar elenco' : 'Selecionar elenco'} <span>→</span></button></div>
-          <div className="team-grid">{rankedTeams.map(({ team, evaluation }) => <TeamCard key={team.id} team={team} roster={roster} evaluation={evaluation} ownedWeapons={ownedWeapons} onToggleWeapon={toggleWeapon} />)}</div>
+          <div className="roster-notice"><div className="notice-icon">✧</div><div><strong>{roster.length ? `${roster.length} personagens no seu elenco` : 'Primeiro, marque quem você já tem'}</strong><span>{roster.length ? 'Os times estão ordenados pelos que você consegue montar; substitutos e posições em falta ficam indicados.' : 'Marque seus personagens para ordenar os times por compatibilidade e ver quem pode substituir quem.'}</span></div><button onClick={() => goTo(navItems[1])}>{roster.length ? 'Editar elenco' : 'Selecionar elenco'} <span>→</span></button></div>
+          <div className="team-grid">{rankedTeams.map(({ team, evaluation }) => <TeamCard key={team.id} team={team} roster={roster} evaluation={evaluation} onEditRoster={() => goTo(navItems[1])} onOpenBuilds={() => goTo(navItems[2])} />)}</div>
           <div className="data-note"><span>ⓘ</span> Builds são uma curadoria inicial baseada nos guias KQM; confirme requisitos de Recarga e ajuste à sua equipe. Algumas trocas alteram a rotação ou o desempenho.</div>
-        </section>
+        </section></>}
 
-        <section className="library-section" id="character-library">
+        {activeNav === 'Personagens' && <section className="library-section" id="character-library">
           <div className="library-heading">
-            <div><div className="section-kicker">SEU ELENCO <span>✧</span></div><h2>Quem já está com você?</h2><p>Toque em um personagem para marcar ou desmarcar.</p></div>
+            <div><div className="section-kicker">PERSONAGENS <span>✧</span></div><h2>Seu elenco</h2><p>Marque quem você já tem para montar times com opções que fazem sentido.</p></div>
             <div className="roster-counter"><strong>{String(roster.length).padStart(2, '0')}</strong><span>DE {characters.length} NO<br />CATÁLOGO</span></div>
           </div>
-          <form className="showcase-import" onSubmit={importShowcase}>
-            <div className="showcase-import-copy"><strong>Importar do Showcase público</strong><span>Adiciona ao elenco os personagens que aparecem no seu perfil do jogo.</span></div>
-            <label><span>UID do Genshin</span><input inputMode="numeric" autoComplete="off" value={enkaUid} onChange={(event) => setEnkaUid(event.target.value)} placeholder="Ex.: 800000000" maxLength={10} /></label>
-            <button type="submit" disabled={enkaBusy || !session?.user || !supabase || loadedProfileUserId !== session?.user?.id}>{enkaBusy ? 'Consultando…' : 'Importar Showcase'}</button>
-            {!session?.user && <small className="showcase-hint">Entre na sua conta para habilitar a importação.</small>}
-            {session?.user && loadedProfileUserId !== session.user.id && <small className="showcase-hint">Carregando seu perfil…</small>}
-            {enkaMessage && <p className="showcase-feedback" role="status">{enkaMessage}</p>}
-            {enkaError && <p className="showcase-feedback showcase-feedback--error" role="alert">{enkaError}</p>}
-          </form>
-          {enkaShowcase?.avatars?.length > 0 && <section className="showcase-imported">
-            <div className="showcase-imported-heading"><div><div className="section-kicker">PERFIL ENKA <span>✧</span></div><h3>Builds do Showcase{enkaShowcase.nickname ? ` · ${enkaShowcase.nickname}` : ''}</h3><p>Dados importados em {new Date(enkaShowcase.importedAt).toLocaleString('pt-BR')} · Mundo {enkaShowcase.worldLevel ?? '—'}</p></div><span>{enkaShowcase.avatars.length} PERSONAGENS</span></div>
-            <div className="showcase-build-grid">{enkaShowcase.avatars.map((entry) => <ShowcaseBuildCard key={entry.characterId} entry={entry} />)}</div>
-            <p className="showcase-disclaimer">A comparação mostra seus atributos equipados e as recomendações cadastradas. Ela ainda não calcula uma nota ou pontuação para cada build.</p>
-          </section>}
           <div className="library-controls">
             <label className="search-box"><span>⌕</span><input aria-label="Buscar personagem" placeholder="Buscar personagem..." value={query} onChange={(event) => setQuery(event.target.value)} /><kbd>⌘ K</kbd></label>
-            <div className="element-filters" aria-label="Filtrar por elemento">{['Todos', 'Pyro', 'Hydro', 'Anemo', 'Electro', 'Cryo', 'Geo', 'Dendro'].map((element) => <button key={element} className={elementFilter === element ? 'selected' : ''} onClick={() => setElementFilter(element)}>{element}</button>)}</div>
+            <label className="library-select"><span>Arma</span><select aria-label="Filtrar por arma" value={weaponFilter} onChange={(event) => setWeaponFilter(event.target.value)}><option value="Todas">Todas</option>{['Espada', 'Espadão', 'Lança', 'Arco', 'Catalisador'].map((weapon) => <option key={weapon} value={weapon}>{weapon}</option>)}</select></label>
+            <label className="library-select"><span>Raridade</span><select aria-label="Filtrar por raridade" value={rarityFilter} onChange={(event) => setRarityFilter(event.target.value)}><option value="Todas">Todas</option><option value="5">5 estrelas</option><option value="4">4 estrelas</option></select></label>
+            <label className="library-select library-select--sort"><span>Ordem</span><select aria-label="Ordenar personagens" value={sortOrder} onChange={(event) => setSortOrder(event.target.value)}><option value="region-release">Região e lançamento</option><option value="release">Lançamento (antigos primeiro)</option><option value="name">Nome A–Z</option><option value="rarity">Raridade</option></select></label>
+            <label className="library-select"><span>Por página</span><select aria-label="Personagens por página" value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}><option value={12}>12</option><option value={24}>24</option><option value={48}>48</option></select></label>
             <button className={`owned-filter${ownedOnly ? ' selected' : ''}`} onClick={() => setOwnedOnly(!ownedOnly)}><span>{ownedOnly ? '✓' : '○'}</span> Tenho</button>
           </div>
-          {filteredCharacters.length ? <div className="character-grid">{filteredCharacters.map((character) => <button key={character.id} className={`character-card${roster.includes(character.id) ? ' character-card--owned' : ''}`} onClick={() => toggleCharacter(character.id)}>
-            <div className="character-portrait" style={{ '--character-color': character.color }}><div className="portrait-halo" />{character.iconUrl && <img className="portrait-image" src={character.iconUrl} alt="" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; }} />}<span className="portrait-initials">{character.initials}</span><span className="portrait-element">{character.element === 'Electro' ? 'ϟ' : character.element === 'Pyro' ? '♨' : character.element === 'Hydro' ? '◌' : character.element === 'Cryo' ? '❄' : character.element === 'Anemo' ? '〰' : '◇'}</span>{roster.includes(character.id) && <span className="owned-check">✓</span>}</div>
-            <div className="character-details"><div className="character-name-row"><strong>{character.name}</strong><span>{'★'.repeat(character.rarity)}</span></div><div className="character-subline"><span>{character.element}</span><i />{character.role}</div></div>
-            <div className={`ownership-state${roster.includes(character.id) ? ' ownership-state--owned' : ''}`}>{roster.includes(character.id) ? 'NO SEU ELENCO' : '+ ADICIONAR'}</div>
-          </button>)}</div> : <div className="empty-state"><span>⌕</span><strong>Nenhum viajante encontrado</strong><p>Tente outro nome, elemento ou filtro.</p></div>}
+          <div className="element-filters" aria-label="Filtrar por elemento">{['Todos', 'Pyro', 'Hydro', 'Anemo', 'Electro', 'Cryo', 'Geo', 'Dendro'].map((element) => <button key={element} className={elementFilter === element ? 'selected' : ''} onClick={() => setElementFilter(element)}>{element}</button>)}</div>
+          {filteredCharacters.length > pageSize && <nav className="character-pagination" aria-label="Paginação do catálogo"><span>Mostrando {(characterPage - 1) * pageSize + 1}–{Math.min(characterPage * pageSize, filteredCharacters.length)} de {filteredCharacters.length}</span><div><button type="button" onClick={() => setCharacterPage((page) => Math.max(1, page - 1))} disabled={characterPage === 1}>← Anterior</button><span>Página {characterPage} de {characterPageCount}</span><button type="button" onClick={() => setCharacterPage((page) => Math.min(characterPageCount, page + 1))} disabled={characterPage === characterPageCount}>Próxima →</button></div></nav>}
+          {filteredCharacters.length ? <div className="character-grid">{visibleCharacters.map((character) => {
+            const isOwned = roster.includes(character.id);
+            return <button key={character.id} aria-pressed={isOwned} className={`character-card${isOwned ? ' character-card--owned' : ''}`} onClick={() => toggleCharacter(character.id)}>
+              <div className="character-portrait" style={{ '--character-color': character.color }}><div className="portrait-halo" />{character.iconUrl && <img className="portrait-image" src={character.iconUrl} alt="" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; }} />}<span className="portrait-initials">{character.initials}</span><span className="portrait-element">{character.element === 'Electro' ? 'ϟ' : character.element === 'Pyro' ? '♨' : character.element === 'Hydro' ? '◌' : character.element === 'Cryo' ? '❄' : character.element === 'Anemo' ? '〰' : '◇'}</span>{isOwned && <><span className="owned-check">✓</span><span className="owned-badge">✓ NO ELENCO</span></>}</div>
+              <div className="character-details"><div className="character-name-row"><strong>{character.name}</strong><span>{'★'.repeat(character.rarity)}</span></div><div className="character-subline"><span>{character.element}</span><i />{character.role}</div></div>
+              <div className={`ownership-state${isOwned ? ' ownership-state--owned' : ''}`}>{isOwned ? 'NO SEU ELENCO' : '+ ADICIONAR'}</div>
+            </button>;
+          })}</div> : <div className="empty-state"><span>⌕</span><strong>Nenhum viajante encontrado</strong><p>Tente outro nome, elemento ou filtro.</p></div>}
+          {filteredCharacters.length > pageSize && <nav className="character-pagination character-pagination--bottom" aria-label="Paginação do catálogo"><span>Mostrando {(characterPage - 1) * pageSize + 1}–{Math.min(characterPage * pageSize, filteredCharacters.length)} de {filteredCharacters.length}</span><div><button type="button" onClick={() => { setCharacterPage((page) => Math.max(1, page - 1)); document.getElementById('character-library')?.scrollIntoView({ behavior: 'smooth' }); }} disabled={characterPage === 1}>← Anterior</button><span>Página {characterPage} de {characterPageCount}</span><button type="button" onClick={() => { setCharacterPage((page) => Math.min(characterPageCount, page + 1)); document.getElementById('character-library')?.scrollIntoView({ behavior: 'smooth' }); }} disabled={characterPage === characterPageCount}>Próxima →</button></div></nav>}
           <div className="library-footnote"><span>◉</span> Seleção salva automaticamente apenas neste navegador. <button onClick={() => { setRoster([]); localStorage.removeItem(STORAGE_KEY); }}>Limpar seleção</button></div>
-        </section>
+        </section>}
 
-        <section className="map-preview" id="map-preview">
+        {activeNav === 'Builds' && <section className="builds-page">
+          <div className="library-heading">
+            <div><div className="section-kicker">EQUIPAMENTOS <span>✧</span></div><h2>Builds do seu elenco</h2><p>Armas e artefatos recomendados para os personagens que você tem.</p></div>
+            <div className="roster-counter"><strong>{String(ownedBuilds.length).padStart(2, '0')}</strong><span>GUIAS<br />DISPONÍVEIS</span></div>
+          </div>
+
+          <details className="showcase-import-disclosure">
+            <summary><span><strong>Importar e comparar seu Showcase</strong><small>Use seu UID público e entre no Teyvat Compass. Não pedimos sua senha do jogo.</small></span><b aria-hidden="true">＋</b></summary>
+            <form className="showcase-import" onSubmit={importShowcase}>
+              <div className="showcase-import-copy"><strong>Seu Showcase precisa estar visível no jogo.</strong><span>Depois, informe o UID da sua conta abaixo.</span></div>
+              <label><span>UID do Genshin</span><input inputMode="numeric" autoComplete="off" value={enkaUid} onChange={(event) => setEnkaUid(event.target.value)} placeholder="Ex.: 800000000" maxLength={10} /></label>
+              <button type="submit" disabled={enkaBusy || !session?.user || !supabase || loadedProfileUserId !== session?.user?.id}>{enkaBusy ? 'Consultando…' : 'Importar Showcase'}</button>
+              {!session?.user && <small className="showcase-hint">Entre na sua conta para habilitar a importação.</small>}
+              {session?.user && loadedProfileUserId !== session.user.id && <small className="showcase-hint">Carregando seu perfil…</small>}
+              {enkaMessage && <p className="showcase-feedback" role="status">{enkaMessage}</p>}
+              {enkaError && <p className="showcase-feedback showcase-feedback--error" role="alert">{enkaError}</p>}
+            </form>
+          </details>
+
+          {roster.length === 0 ? <div className="empty-state builds-empty-state"><span>✧</span><strong>Escolha seus personagens primeiro</strong><p>Assim mostramos recomendações de armas e artefatos para quem já faz parte do seu elenco.</p><button className="primary-button" onClick={() => goTo(navItems[1])}>Ir para Personagens <span>→</span></button></div> : <>
+            {ownedBuilds.length > 0 ? <>
+              <details className="owned-builds-disclosure">
+                <summary><span><strong>Guias gerais do seu elenco</strong><small>{ownedBuilds.length} personagens · recomendações de armas, artefatos e atributos</small></span><b aria-hidden="true">＋</b></summary>
+                <div className="builds-page-intro"><strong>{ownedBuilds.length} de {roster.length} personagens do elenco têm guias cadastrados.</strong><span>Abra um personagem para conferir alternativas de armas, artefatos e atributos. Marque as armas que você possui para vê-las primeiro.</span></div>
+                <div className="owned-build-grid">{ownedBuilds.map((character) => <details className="owned-build-panel" key={character.id}>
+                  <summary><span className="owned-build-icon" style={{ '--character-color': character.color }}>{character.initials}</span><span><strong>{character.name}</strong><small>{builds[character.id].style}</small></span><b aria-hidden="true">＋</b></summary>
+                  <CharacterBuildCard character={character} build={builds[character.id]} ownedWeapons={ownedWeapons} onToggleWeapon={toggleWeapon} />
+                </details>)}</div>
+              </details>
+            </> : <div className="empty-state builds-empty-state"><span>⌖</span><strong>Estamos preparando estes guias</strong><p>Os personagens do seu elenco ainda não têm recomendações cadastradas. Selecione outros no catálogo para ver os guias disponíveis.</p><button className="primary-button" onClick={() => goTo(navItems[1])}>Ver Personagens <span>→</span></button></div>}
+            {ownedCharactersWithoutBuilds.length > 0 && ownedBuilds.length > 0 && <p className="builds-coverage-note"><strong>Ainda sem guia</strong><span>{ownedCharactersWithoutBuilds.map((character) => character.name).join(', ')}. A cobertura do catálogo será ampliada aos poucos.</span></p>}
+          </>}
+
+          {enkaShowcase?.avatars?.length > 0 && <details className="showcase-imported-disclosure">
+            <summary>Ver builds importadas do Showcase · {enkaShowcase.avatars.length} personagens</summary>
+            <section className="showcase-imported">
+              <div className="showcase-imported-heading"><div><div className="section-kicker">PERFIL ENKA <span>✧</span></div><h3>{enkaShowcase.nickname ? `Builds de ${enkaShowcase.nickname}` : 'Builds do Showcase'}</h3><p>Dados importados em {new Date(enkaShowcase.importedAt).toLocaleString('pt-BR')} · Mundo {enkaShowcase.worldLevel ?? '—'}</p></div><span>{enkaShowcase.avatars.length} PERSONAGENS</span></div>
+              <div className="showcase-character-picker" role="group" aria-label="Escolha o personagem para ver a build">
+                {showcaseEntries.map((entry) => {
+                  const character = getCharacter(entry.characterId);
+                  if (!character) return null;
+                  const selected = entry.characterId === (selectedShowcaseEntry?.characterId);
+                  return <button key={entry.characterId} type="button" className={`showcase-character-choice${selected ? ' showcase-character-choice--selected' : ''}`} aria-pressed={selected} onClick={() => setSelectedShowcaseCharacterId(entry.characterId)}>
+                    {character.iconUrl ? <img src={character.iconUrl} alt="" loading="lazy" /> : <span>{character.initials}</span>}
+                    <strong>{character.name}</strong>
+                  </button>;
+                })}
+              </div>
+              {selectedShowcaseEntry && <ShowcaseBuildCard key={selectedShowcaseEntry.characterId} entry={selectedShowcaseEntry} />}
+              <p className="showcase-disclaimer">A comparação mostra seus atributos equipados e as recomendações cadastradas. Ela ainda não calcula uma nota ou pontuação para cada build.</p>
+            </section>
+          </details>}
+        </section>}
+
+        {activeNav === 'Meu plano' && <section className="map-preview" id="map-preview">
           <div className="map-mini-art"><div className="map-grid-lines" /><span className="map-pin">⌖</span><i className="map-route" /></div>
           <div className="map-preview-copy"><span className="section-kicker">SEU PRÓXIMO CAPÍTULO <span>✧</span></span><h2>Explore no seu ritmo.</h2><p>Um mapa com seus pontos de interesse e o progresso da sua jornada está no horizonte.</p></div>
           <span className="coming-soon">EM BREVE</span>
-        </section>
+        </section>}
         <footer className="page-footer"><span>TEYVAT COMPASS <i>✦</i> UMA FERRAMENTA FEITA POR FÃS</span><span>Não afiliado à HoYoverse. Genshin Impact é propriedade da HoYoverse.</span></footer>
       </main>
     </div>

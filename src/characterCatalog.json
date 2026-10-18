@@ -6,7 +6,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Ayaka.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Ayaka.png",
+    "release": 1626814800
   },
   {
     "avatarId": 10000003,
@@ -15,7 +16,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Qin.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Qin.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000005,
@@ -24,7 +26,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": null,
-    "icon": "/ui/UI_AvatarIcon_Side_PlayerBoy.png"
+    "icon": "/ui/UI_AvatarIcon_Side_PlayerBoy.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000006,
@@ -33,7 +36,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Lisa.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Lisa.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000014,
@@ -42,7 +46,8 @@
     "element": "Hydro",
     "rarity": 4,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Barbara.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Barbara.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000015,
@@ -51,7 +56,8 @@
     "element": "Cryo",
     "rarity": 4,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Kaeya.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Kaeya.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000016,
@@ -60,7 +66,8 @@
     "element": "Pyro",
     "rarity": 5,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Diluc.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Diluc.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000020,
@@ -69,7 +76,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Razor.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Razor.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000021,
@@ -78,7 +86,8 @@
     "element": "Pyro",
     "rarity": 4,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Ambor.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Ambor.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000022,
@@ -87,7 +96,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Venti.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Venti.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000023,
@@ -96,7 +106,8 @@
     "element": "Pyro",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Xiangling.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Xiangling.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000024,
@@ -105,7 +116,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Beidou.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Beidou.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000025,
@@ -114,7 +126,8 @@
     "element": "Hydro",
     "rarity": 4,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Xingqiu.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Xingqiu.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000026,
@@ -123,7 +136,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Xiao.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Xiao.png",
+    "release": 1612216800
   },
   {
     "avatarId": 10000027,
@@ -132,7 +146,8 @@
     "element": "Geo",
     "rarity": 4,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Ningguang.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Ningguang.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000029,
@@ -141,7 +156,8 @@
     "element": "Pyro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Klee.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Klee.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000030,
@@ -150,7 +166,8 @@
     "element": "Geo",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Zhongli.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Zhongli.png",
+    "release": 1606874400
   },
   {
     "avatarId": 10000031,
@@ -159,7 +176,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Fischl.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Fischl.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000032,
@@ -168,7 +186,8 @@
     "element": "Pyro",
     "rarity": 4,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Bennett.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Bennett.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000033,
@@ -177,7 +196,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Tartaglia.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Tartaglia.png",
+    "release": 1605060000
   },
   {
     "avatarId": 10000034,
@@ -186,7 +206,8 @@
     "element": "Geo",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Noel.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Noel.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000035,
@@ -195,7 +216,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Qiqi.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Qiqi.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000036,
@@ -204,7 +226,8 @@
     "element": "Cryo",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Chongyun.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Chongyun.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000037,
@@ -213,7 +236,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Ganyu.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Ganyu.png",
+    "release": 1610467200
   },
   {
     "avatarId": 10000038,
@@ -222,7 +246,8 @@
     "element": "Geo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Albedo.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Albedo.png",
+    "release": 1608588000
   },
   {
     "avatarId": 10000039,
@@ -231,7 +256,8 @@
     "element": "Cryo",
     "rarity": 4,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Diona.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Diona.png",
+    "release": 1605060000
   },
   {
     "avatarId": 10000041,
@@ -240,7 +266,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Mona.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Mona.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000042,
@@ -249,7 +276,8 @@
     "element": "Electro",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Keqing.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Keqing.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000043,
@@ -258,7 +286,8 @@
     "element": "Anemo",
     "rarity": 4,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Sucrose.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Sucrose.png",
+    "release": 1601244000
   },
   {
     "avatarId": 10000044,
@@ -267,7 +296,8 @@
     "element": "Pyro",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Xinyan.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Xinyan.png",
+    "release": 1606874400
   },
   {
     "avatarId": 10000045,
@@ -276,7 +306,8 @@
     "element": "Cryo",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Rosaria.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Rosaria.png",
+    "release": 1617721200
   },
   {
     "avatarId": 10000046,
@@ -285,7 +316,8 @@
     "element": "Pyro",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Hutao.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Hutao.png",
+    "release": 1614700800
   },
   {
     "avatarId": 10000047,
@@ -294,7 +326,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Kazuha.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Kazuha.png",
+    "release": 1624978800
   },
   {
     "avatarId": 10000048,
@@ -303,7 +336,8 @@
     "element": "Pyro",
     "rarity": 4,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Feiyan.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Feiyan.png",
+    "release": 1619470800
   },
   {
     "avatarId": 10000049,
@@ -312,7 +346,8 @@
     "element": "Pyro",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Yoimiya.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Yoimiya.png",
+    "release": 1628607600
   },
   {
     "avatarId": 10000050,
@@ -321,7 +356,8 @@
     "element": "Pyro",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Tohma.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Tohma.png",
+    "release": 1635868800
   },
   {
     "avatarId": 10000051,
@@ -330,7 +366,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Eula.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Eula.png",
+    "release": 1621350000
   },
   {
     "avatarId": 10000052,
@@ -339,7 +376,8 @@
     "element": "Electro",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Shougun.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Shougun.png",
+    "release": 1630443600
   },
   {
     "avatarId": 10000053,
@@ -348,7 +386,8 @@
     "element": "Anemo",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Sayu.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Sayu.png",
+    "release": 1628607600
   },
   {
     "avatarId": 10000054,
@@ -357,7 +396,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Kokomi.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Kokomi.png",
+    "release": 1632236400
   },
   {
     "avatarId": 10000055,
@@ -366,7 +406,8 @@
     "element": "Geo",
     "rarity": 4,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Gorou.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Gorou.png",
+    "release": 1639497600
   },
   {
     "avatarId": 10000056,
@@ -375,7 +416,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Sara.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Sara.png",
+    "release": 1630443600
   },
   {
     "avatarId": 10000057,
@@ -384,7 +426,8 @@
     "element": "Geo",
     "rarity": 5,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Itto.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Itto.png",
+    "release": 1639497600
   },
   {
     "avatarId": 10000058,
@@ -393,7 +436,8 @@
     "element": "Electro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Yae.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Yae.png",
+    "release": 1644962400
   },
   {
     "avatarId": 10000059,
@@ -402,7 +446,8 @@
     "element": "Anemo",
     "rarity": 4,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Heizo.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Heizo.png",
+    "release": 1657659600
   },
   {
     "avatarId": 10000060,
@@ -411,7 +456,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Yelan.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Yelan.png",
+    "release": 1653944400
   },
   {
     "avatarId": 10000061,
@@ -420,7 +466,8 @@
     "element": "Dendro",
     "rarity": 4,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Momoka.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Momoka.png",
+    "release": 1684789200
   },
   {
     "avatarId": 10000062,
@@ -429,7 +476,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Aloy.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Aloy.png",
+    "release": 1630443600
   },
   {
     "avatarId": 10000063,
@@ -438,7 +486,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Shenhe.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Shenhe.png",
+    "release": 1641333600
   },
   {
     "avatarId": 10000064,
@@ -447,7 +496,8 @@
     "element": "Geo",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Yunjin.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Yunjin.png",
+    "release": 1641333600
   },
   {
     "avatarId": 10000065,
@@ -456,7 +506,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Shinobu.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Shinobu.png",
+    "release": 1655823600
   },
   {
     "avatarId": 10000066,
@@ -465,7 +516,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Ayato.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Ayato.png",
+    "release": 1648587600
   },
   {
     "avatarId": 10000067,
@@ -474,7 +526,8 @@
     "element": "Dendro",
     "rarity": 4,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Collei.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Collei.png",
+    "release": 1661288400
   },
   {
     "avatarId": 10000068,
@@ -483,7 +536,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Dori.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Dori.png",
+    "release": 1662735600
   },
   {
     "avatarId": 10000069,
@@ -492,7 +546,8 @@
     "element": "Dendro",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Tighnari.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Tighnari.png",
+    "release": 1661288400
   },
   {
     "avatarId": 10000070,
@@ -501,7 +556,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Nilou.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Nilou.png",
+    "release": 1665759600
   },
   {
     "avatarId": 10000071,
@@ -510,7 +566,8 @@
     "element": "Electro",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Cyno.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Cyno.png",
+    "release": 1664226000
   },
   {
     "avatarId": 10000072,
@@ -519,7 +576,8 @@
     "element": "Hydro",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Candace.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Candace.png",
+    "release": 1664226000
   },
   {
     "avatarId": 10000073,
@@ -528,7 +586,8 @@
     "element": "Dendro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Nahida.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Nahida.png",
+    "release": 1667253600
   },
   {
     "avatarId": 10000074,
@@ -537,7 +596,8 @@
     "element": "Cryo",
     "rarity": 4,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Layla.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Layla.png",
+    "release": 1668787200
   },
   {
     "avatarId": 10000075,
@@ -546,7 +606,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Wanderer.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Wanderer.png",
+    "release": 1670277600
   },
   {
     "avatarId": 10000076,
@@ -555,7 +616,8 @@
     "element": "Anemo",
     "rarity": 4,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Faruzan.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Faruzan.png",
+    "release": 1670277600
   },
   {
     "avatarId": 10000077,
@@ -564,7 +626,8 @@
     "element": "Dendro",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Yaoyao.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Yaoyao.png",
+    "release": 1673906400
   },
   {
     "avatarId": 10000078,
@@ -573,7 +636,8 @@
     "element": "Dendro",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Alhatham.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Alhatham.png",
+    "release": 1673906400
   },
   {
     "avatarId": 10000079,
@@ -582,7 +646,8 @@
     "element": "Pyro",
     "rarity": 5,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Dehya.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Dehya.png",
+    "release": 1677535200
   },
   {
     "avatarId": 10000080,
@@ -591,7 +656,8 @@
     "element": "Cryo",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Mika.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Mika.png",
+    "release": 1679414400
   },
   {
     "avatarId": 10000081,
@@ -600,7 +666,8 @@
     "element": "Dendro",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Kaveh.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Kaveh.png",
+    "release": 1683039600
   },
   {
     "avatarId": 10000082,
@@ -609,7 +676,8 @@
     "element": "Dendro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Baizhuer.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Baizhuer.png",
+    "release": 1683039600
   },
   {
     "avatarId": 10000083,
@@ -618,7 +686,8 @@
     "element": "Anemo",
     "rarity": 4,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Linette.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Linette.png",
+    "release": 1692046800
   },
   {
     "avatarId": 10000084,
@@ -627,7 +696,8 @@
     "element": "Pyro",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Liney.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Liney.png",
+    "release": 1692046800
   },
   {
     "avatarId": 10000085,
@@ -636,7 +706,8 @@
     "element": "Cryo",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Freminet.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Freminet.png",
+    "release": 1693926000
   },
   {
     "avatarId": 10000086,
@@ -645,7 +716,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Wriothesley.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Wriothesley.png",
+    "release": 1697554800
   },
   {
     "avatarId": 10000087,
@@ -654,7 +726,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Neuvillette.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Neuvillette.png",
+    "release": 1695675600
   },
   {
     "avatarId": 10000088,
@@ -663,7 +736,8 @@
     "element": "Cryo",
     "rarity": 4,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Charlotte.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Charlotte.png",
+    "release": 1699308000
   },
   {
     "avatarId": 10000089,
@@ -672,7 +746,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Furina.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Furina.png",
+    "release": 1699308000
   },
   {
     "avatarId": 10000090,
@@ -681,7 +756,8 @@
     "element": "Pyro",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Chevreuse.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Chevreuse.png",
+    "release": 1704816000
   },
   {
     "avatarId": 10000091,
@@ -690,7 +766,8 @@
     "element": "Geo",
     "rarity": 5,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Navia.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Navia.png",
+    "release": 1702936800
   },
   {
     "avatarId": 10000092,
@@ -699,7 +776,8 @@
     "element": "Pyro",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Gaming.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Gaming.png",
+    "release": 1706565600
   },
   {
     "avatarId": 10000093,
@@ -708,7 +786,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Liuyun.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Liuyun.png",
+    "release": 1706565600
   },
   {
     "avatarId": 10000094,
@@ -717,7 +796,8 @@
     "element": "Geo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Chiori.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Chiori.png",
+    "release": 1710194400
   },
   {
     "avatarId": 10000095,
@@ -726,7 +806,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Sigewinne.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Sigewinne.png",
+    "release": 1719414000
   },
   {
     "avatarId": 10000096,
@@ -735,7 +816,8 @@
     "element": "Pyro",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Arlecchino.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Arlecchino.png",
+    "release": 1713819600
   },
   {
     "avatarId": 10000097,
@@ -744,7 +826,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Sethos.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Sethos.png",
+    "release": 1717448400
   },
   {
     "avatarId": 10000098,
@@ -753,7 +836,8 @@
     "element": "Electro",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Clorinde.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Clorinde.png",
+    "release": 1717448400
   },
   {
     "avatarId": 10000099,
@@ -762,7 +846,8 @@
     "element": "Dendro",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Emilie.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Emilie.png",
+    "release": 1722956400
   },
   {
     "avatarId": 10000100,
@@ -771,7 +856,8 @@
     "element": "Geo",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Kachina.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Kachina.png",
+    "release": 1724706000
   },
   {
     "avatarId": 10000101,
@@ -780,7 +866,8 @@
     "element": "Dendro",
     "rarity": 5,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Kinich.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Kinich.png",
+    "release": 1726585200
   },
   {
     "avatarId": 10000102,
@@ -789,7 +876,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Mualani.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Mualani.png",
+    "release": 1724706000
   },
   {
     "avatarId": 10000103,
@@ -798,7 +886,8 @@
     "element": "Geo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Xilonen.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Xilonen.png",
+    "release": 1728334800
   },
   {
     "avatarId": 10000104,
@@ -807,7 +896,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Chasca.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Chasca.png",
+    "release": 1731967200
   },
   {
     "avatarId": 10000105,
@@ -816,7 +906,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Olorun.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Olorun.png",
+    "release": 1731967200
   },
   {
     "avatarId": 10000106,
@@ -825,7 +916,8 @@
     "element": "Pyro",
     "rarity": 5,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Mavuika.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Mavuika.png",
+    "release": 1735596000
   },
   {
     "avatarId": 10000107,
@@ -834,7 +926,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Citlali.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Citlali.png",
+    "release": 1735596000
   },
   {
     "avatarId": 10000108,
@@ -843,7 +936,8 @@
     "element": "Anemo",
     "rarity": 4,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Lanyan.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Lanyan.png",
+    "release": 1737475200
   },
   {
     "avatarId": 10000109,
@@ -852,7 +946,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Mizuki.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Mizuki.png",
+    "release": 1739224800
   },
   {
     "avatarId": 10000110,
@@ -861,7 +956,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Iansan.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Iansan.png",
+    "release": 1742853600
   },
   {
     "avatarId": 10000111,
@@ -870,7 +966,8 @@
     "element": "Electro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Varesa.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Varesa.png",
+    "release": 1742853600
   },
   {
     "avatarId": 10000112,
@@ -879,7 +976,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Escoffier.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Escoffier.png",
+    "release": 1746478800
   },
   {
     "avatarId": 10000113,
@@ -888,7 +986,8 @@
     "element": "Anemo",
     "rarity": 4,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Ifa.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Ifa.png",
+    "release": 1746478800
   },
   {
     "avatarId": 10000114,
@@ -897,7 +996,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_SkirkNew.png"
+    "icon": "/ui/UI_AvatarIcon_Side_SkirkNew.png",
+    "release": 1750107600
   },
   {
     "avatarId": 10000115,
@@ -906,7 +1006,8 @@
     "element": "Hydro",
     "rarity": 4,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Dahlia.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Dahlia.png",
+    "release": 1750107600
   },
   {
     "avatarId": 10000116,
@@ -915,7 +1016,8 @@
     "element": "Electro",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Ineffa.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Ineffa.png",
+    "release": 1753736400
   },
   {
     "avatarId": 10000119,
@@ -924,7 +1026,8 @@
     "element": "Dendro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Lauma.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Lauma.png",
+    "release": 1757365200
   },
   {
     "avatarId": 10000120,
@@ -933,7 +1036,8 @@
     "element": "Electro",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Flins.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Flins.png",
+    "release": 1759244400
   },
   {
     "avatarId": 10000121,
@@ -942,7 +1046,8 @@
     "element": "Hydro",
     "rarity": 4,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Aino.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Aino.png",
+    "release": 1757365200
   },
   {
     "avatarId": 10000122,
@@ -951,7 +1056,8 @@
     "element": "Dendro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Nefer.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Nefer.png",
+    "release": 1760994000
   },
   {
     "avatarId": 10000123,
@@ -960,7 +1066,8 @@
     "element": "Pyro",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Durin.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Durin.png",
+    "release": 1764626400
   },
   {
     "avatarId": 10000124,
@@ -969,7 +1076,8 @@
     "element": "Anemo",
     "rarity": 4,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Jahoda.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Jahoda.png",
+    "release": 1764626400
   },
   {
     "avatarId": 10000125,
@@ -978,7 +1086,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Columbina.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Columbina.png",
+    "release": 1768255200
   },
   {
     "avatarId": 10000126,
@@ -987,7 +1096,8 @@
     "element": "Geo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Zibai.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Zibai.png",
+    "release": 1770134400
   },
   {
     "avatarId": 10000127,
@@ -996,7 +1106,8 @@
     "element": "Geo",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Illuga.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Illuga.png",
+    "release": 1770134400
   },
   {
     "avatarId": 10000128,
@@ -1005,7 +1116,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_Varka.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Varka.png",
+    "release": 1771884000
   },
   {
     "avatarId": 10000129,
@@ -1014,7 +1126,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Lohen.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Lohen.png",
+    "release": 1781017200
   },
   {
     "avatarId": 10000130,
@@ -1023,7 +1136,8 @@
     "element": "Geo",
     "rarity": 5,
     "weapon": "Arco",
-    "icon": "/ui/UI_AvatarIcon_Side_Linnea.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Linnea.png",
+    "release": 1775509200
   },
   {
     "avatarId": 10000131,
@@ -1032,7 +1146,8 @@
     "element": "Pyro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Nicole.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Nicole.png",
+    "release": 1779138000
   },
   {
     "avatarId": 10000132,
@@ -1041,7 +1156,8 @@
     "element": "Anemo",
     "rarity": 4,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Prune.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Prune.png",
+    "release": 1779138000
   },
   {
     "avatarId": 10000133,
@@ -1050,7 +1166,8 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Espadão",
-    "icon": "/ui/UI_AvatarIcon_Side_MarionetteNew.png"
+    "icon": "/ui/UI_AvatarIcon_Side_MarionetteNew.png",
+    "release": 1782766800
   },
   {
     "avatarId": 10000140,
@@ -1059,7 +1176,8 @@
     "element": "Hydro",
     "rarity": 5,
     "weapon": "Catalisador",
-    "icon": "/ui/UI_AvatarIcon_Side_Vodyanitsa.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Vodyanitsa.png",
+    "release": 1790024400
   },
   {
     "avatarId": 10000143,
@@ -1068,7 +1186,8 @@
     "element": "Anemo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Vesna.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Vesna.png",
+    "release": 1790024400
   },
   {
     "avatarId": 10000148,
@@ -1077,7 +1196,8 @@
     "element": "Electro",
     "rarity": 4,
     "weapon": "Lança",
-    "icon": "/ui/UI_AvatarIcon_Side_Alyosha.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Alyosha.png",
+    "release": 1786395600
   },
   {
     "avatarId": 10000150,
@@ -1086,6 +1206,7 @@
     "element": "Cryo",
     "rarity": 5,
     "weapon": "Espada",
-    "icon": "/ui/UI_AvatarIcon_Side_Odette.png"
+    "icon": "/ui/UI_AvatarIcon_Side_Odette.png",
+    "release": 1786395600
   }
 ]

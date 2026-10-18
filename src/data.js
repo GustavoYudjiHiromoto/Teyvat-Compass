@@ -1,3 +1,4 @@
+// Datas de lançamento vêm do snapshot da API pública Yatta: https://gi.yatta.moe/api/v2/en/avatar
 import characterCatalog from './characterCatalog.json';
 
 const curatedCharacters = [
@@ -22,6 +23,19 @@ const curatedCharacters = [
 ];
 
 const curatedById = new Map(curatedCharacters.map((character) => [character.id, character]));
+const characterRegions = {
+  Mondstadt: ['traveler', 'jean', 'lisa', 'barbara', 'kaeya', 'diluc', 'razor', 'amber', 'venti', 'klee', 'fischl', 'bennett', 'noelle', 'sucrose', 'mona', 'albedo', 'diona', 'rosaria', 'eula', 'mika', 'durin', 'varka', 'lohen', 'nicole', 'dahlia'],
+  Liyue: ['xiangling', 'beidou', 'xingqiu', 'xiao', 'ningguang', 'zhongli', 'ganyu', 'chongyun', 'qiqi', 'keqing', 'xinyan', 'hutao', 'yanfei', 'shenhe', 'yunjin', 'yelan', 'yaoyao', 'baizhu', 'gaming', 'xianyun', 'lan_yan', 'zibai', 'illuga'],
+  Inazuma: ['kamisato_ayaka', 'kaedehara_kazuha', 'yoimiya', 'thoma', 'shogun_raiden', 'sayu', 'sangonomiya_kokomi', 'gorou', 'kujou_sara', 'arataki_itto', 'yae_miko', 'shikanoin_heizou', 'kirara', 'kuki_shinobu', 'kamisato_ayato', 'chiori', 'yumemizuki_mizuki'],
+  Sumeru: ['collei', 'dori', 'tighnari', 'nilou', 'cyno', 'candace', 'nahida', 'layla', 'wanderer', 'faruzan', 'alhaitham', 'dehya', 'kaveh', 'sethos'],
+  Fontaine: ['lynette', 'lyney', 'freminet', 'wriothesley', 'neuvillette', 'charlotte', 'furina', 'chevreuse', 'navia', 'sigewinne', 'arlecchino', 'clorinde', 'emilie', 'escoffier', 'skirk', 'prune'],
+  Natlan: ['kachina', 'kinich', 'mualani', 'xilonen', 'chasca', 'ororon', 'mavuika', 'citlali', 'iansan', 'varesa', 'ifa', 'jahoda'],
+  'Nod-Krai': ['ineffa', 'lauma', 'flins', 'nefer', 'columbina', 'aino', 'linnea', 'aloy'],
+  Snezhnaya: ['tartaglia', 'sandrone', 'vodyanitsa', 'vesna', 'alyosha', 'odette'],
+};
+const normalizeRegionKey = (value) => value.toLocaleLowerCase('pt-BR').replace(/[^a-z0-9]/g, '');
+const regionByCharacterId = new Map(Object.entries(characterRegions).flatMap(([region, ids]) => ids.map((id) => [normalizeRegionKey(id), region])));
+const regionOrder = Object.keys(characterRegions);
 const elementColors = {
   Anemo: '#a5c58c', Cryo: '#83b5d3', Dendro: '#8bab76', Electro: '#ad9bd1',
   Geo: '#d9c68b', Hydro: '#74bbd3', Pyro: '#ed866f',
@@ -33,6 +47,7 @@ export const characters = characterCatalog.map((entry) => {
   return {
     ...entry,
     ...curated,
+    region: regionByCharacterId.get(normalizeRegionKey(entry.id)) || regionByCharacterId.get(normalizeRegionKey(entry.name)) || (entry.name === 'Andarilho' ? 'Sumeru' : 'Outras regiões'),
     avatarId: entry.avatarId,
     iconUrl: entry.icon
       ? `https://enka.network${entry.icon.replace('UI_AvatarIcon_Side_', 'UI_AvatarIcon_')}`
