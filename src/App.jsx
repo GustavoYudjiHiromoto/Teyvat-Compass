@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { characters, teams } from './data.js';
-import { evaluateTeam, getTeamReactionOpportunities } from './recommendations.js';
+import { evaluateTeam, getTeamReactionOpportunities, getTeamRoleCoverage } from './recommendations.js';
 import { builds, buildSourceName } from './builds.js';
 import { isSupabaseConfigured, supabase } from './lib/supabase.js';
 import { enkaAvatarToCharacter, getEnkaCache, saveEnkaCache } from './enka.js';
@@ -182,7 +182,115 @@ function AccountMenu({ session, profileStatus, profileFeedback }) {
   );
 }
 
-function TeamCard({ team, roster, evaluation, focusCharacterId, isCustomized, onEditRoster, onOpenTeamBuilds }) {
+function TeamAiAssistant({ rankedTeams, roster, authenticated, enabled, onOpenTeamBuilds }) {
+  const [preference, setPreference] = useState('');
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const normalizeSearchText = (value) => value.toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+
+  const ask = async (event) => {
+    event.preventDefault();
+    if (!enabled || busy || !preference.trim()) return;
+    setBusy(true);
+    setError('');
+    setResult(null);
+
+    const normalizedPreference = normalizeSearchText(preference);
+    const requestedCharacter = characters.find((character) => {
+      const nameParts = character.name.split(/\s+/).map(normalizeSearchText).filter((part) => part.length >= 4);
+      return nameParts.some((part) => normalizedPreference.includes(part));
+    });
+    const asksForAlternatives = /alternativ|substitut|algo parecido|similar|em vez|no lugar/i.test(preference);
+    const teamsForCharacter = requestedCharacter ? teams.filter((team) => team.slots.some((slot) =>
+      slot.characterId === requestedCharacter.id || slot.alternatives?.some((alternative) => alternative.characterId === requestedCharacter.id))) : teams;
+
+    if (requestedCharacter && teamsForCharacter.length === 0 && !asksForAlternatives) {
+      setBusy(false);
+      setResult({
+        summary: `Ainda não há uma formação cadastrada para ${requestedCharacter.name}.`,
+        emptyMessage: `Não vou sugerir outro time como se fosse uma recomendação validada para ${requestedCharacter.name}. Se quiser, peça alternativas e eu comparo com as formações que temos.`,
+        recommendations: [],
+      });
+      return;
+    }
+
+    const teamsToCompare = requestedCharacter && teamsForCharacter.length > 0 && !asksForAlternatives
+      ? rankedTeams.filter(({ team }) => teamsForCharacter.some((candidate) => candidate.id === team.id))
+      : rankedTeams;
+
+    const teamsForRequest = teamsToCompare.slice(0, 8).map(({ team, evaluation }) => ({
+      id: team.id,
+      title: team.title,
+      explanation: team.explanation,
+      missingCount: evaluation.missingCount,
+      members: team.slots.map((slot, index) => {
+        const selected = evaluation.lineup[index];
+        const character = selected?.character || getCharacter(slot.characterId);
+        return character ? {
+          name: character.name,
+          element: character.element,
+          role: character.role,
+          owned: Boolean(selected),
+        } : null;
+      }).filter(Boolean),
+    }));
+
+    try {
+      const { data, error: invokeError } = await supabase.functions.invoke('team-assistant', {
+        body: {
+          preference: preference.trim().slice(0, 240),
+          roster: roster.map((id) => getCharacter(id)).filter(Boolean).map(({ name, element, role }) => ({ name, element, role })),
+          teams: teamsForRequest,
+        },
+      });
+      if (invokeError) {
+        let message = 'Não foi possível consultar a IA agora.';
+        try {
+          const payload = await invokeError.context?.json();
+          if (payload?.error) message = `${payload.error}${payload.detail ? ` Detalhe: ${payload.detail}` : ''}`;
+        } catch { /* Mantém a mensagem padrão para erros sem resposta JSON. */ }
+        throw new Error(message);
+      }
+      const visibleTeamIds = new Set(teamsToCompare.map(({ team }) => team.id));
+      const recommendations = (Array.isArray(data?.recommendations) ? data.recommendations : [])
+        .filter((item) => visibleTeamIds.has(item.teamId))
+        .slice(0, 3);
+      setResult({ summary: data?.summary || '', recommendations });
+    } catch (requestError) {
+      setError(requestError.message || 'Não foi possível consultar a IA agora.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return <section className="team-ai-panel" aria-labelledby="team-ai-title">
+    <div className="team-ai-heading"><div><span className="section-kicker">ASSISTENTE DE TIMES <span>✧</span></span><h3 id="team-ai-title">Adapte uma formação ao que você procura</h3><p>A IA compara apenas os times e personagens cadastrados no Compass.</p></div><span className="team-ai-limit">Até 5 consultas por dia</span></div>
+    {!authenticated && <p className="team-ai-signin">Entre na sua conta Supabase para usar o assistente. A consulta envia seu elenco e a preferência escrita, sem UID nem dados de login do jogo.</p>}
+    {authenticated && roster.length === 0 && <p className="team-ai-signin">Selecione personagens no seu elenco para a IA comparar as formações disponíveis.</p>}
+    {authenticated && roster.length > 0 && !enabled && <p className="team-ai-signin">Carregando seu perfil; o assistente ficará disponível assim que terminar.</p>}
+    <form className="team-ai-form" onSubmit={ask}>
+      <label htmlFor="team-ai-preference">O que você procura?</label>
+      <div><input id="team-ai-preference" maxLength={240} value={preference} onChange={(event) => setPreference(event.target.value)} placeholder="Ex.: um time mais seguro com Nahida" disabled={!enabled || busy} /><button type="submit" disabled={!enabled || busy || !preference.trim()}>{busy ? 'Comparando…' : 'Comparar times'}</button></div>
+      <small>{preference.length}/240 · A resposta usa apenas os dados cadastrados; não calcula dano ou rotação.</small>
+    </form>
+    {error && <p className="team-ai-error" role="alert">{error}</p>}
+    {result && <div className="team-ai-result" aria-live="polite">
+      {result.summary && <p>{result.summary}</p>}
+      {result.recommendations.length > 0 ? <div className="team-ai-results">{result.recommendations.map((recommendation) => {
+        const match = rankedTeams.find(({ team }) => team.id === recommendation.teamId);
+        if (!match) return null;
+        return <article key={recommendation.teamId}>
+          <div><strong>{match.team.title}</strong><p>{recommendation.reason}</p>{recommendation.tradeoff && <small>Considere: {recommendation.tradeoff}</small>}</div>
+          <button type="button" onClick={() => onOpenTeamBuilds(match.team.id)}>Abrir time →</button>
+        </article>;
+      })}</div> : <p>{result.emptyMessage || 'Não encontrei uma formação cadastrada que atenda ao pedido. Tente outra preferência.'}</p>}
+    </div>}
+  </section>;
+}
+
+function TeamCard({ team, roster, evaluation, focusCharacterId, isCustomized, onEditRoster, onOpenTeamBuilds, featured = false }) {
   const complete = evaluation.coveredCount === team.slots.length;
   const missingSlots = team.slots.filter((slot, index) => !evaluation.lineup[index]);
   const assignedIds = new Set(evaluation.lineup.filter(Boolean).map((selection) => selection.characterId));
@@ -197,7 +305,8 @@ function TeamCard({ team, roster, evaluation, focusCharacterId, isCustomized, on
         : `${evaluation.coveredCount}/${team.slots.length} posições`;
 
   return (
-    <article className={`team-card${complete && roster.length ? ' team-card--match' : ''}`}>
+    <article className={`team-card${complete && roster.length ? ' team-card--match' : ''}${featured ? ' team-card--featured' : ''}`}>
+      <div className="team-card-overview">
       <div className="team-card-top">
         <div className="team-mark"><CompassMark small /></div>
         <span className={`match-pill${complete && roster.length ? ' match-pill--good' : ''}`}>{statusLabel}</span>
@@ -224,6 +333,8 @@ function TeamCard({ team, roster, evaluation, focusCharacterId, isCustomized, on
           );
         })}
       </div>
+      </div>
+      <div className="team-card-details">
       <button className="team-build-action" type="button" onClick={() => onOpenTeamBuilds(team.id)}>
         Ver builds deste time <span>{availableBuildCount} guias · abrir →</span>
       </button>
@@ -234,7 +345,7 @@ function TeamCard({ team, roster, evaluation, focusCharacterId, isCustomized, on
           {evaluation.lineup.some((selection) => selection?.kind === 'alternative') && <ul className="swap-reasons">
             {evaluation.lineup.filter((selection) => selection?.kind === 'alternative').map((selection) => <li key={`${team.id}-${selection.characterId}`}><b>{selection.character.name}</b> no lugar de <b>{getCharacter(selection.slot.characterId)?.name}</b>: {selection.reason}.</li>)}
           </ul>}
-          {evaluation.lineup.some((selection) => selection?.kind === 'custom') && <p className="missing-options">O Compass não avalia a função do personagem na posição. As combinações elementais aparecem nas builds como possibilidades, sem análise de rotação.</p>}
+          {evaluation.lineup.some((selection) => selection?.kind === 'custom') && <p className="missing-options">Troca manual: o papel exibido vem do catálogo geral do personagem; o Compass não confirma se ele cumpre esta posição nem calcula a rotação. Veja abaixo as combinações elementais possíveis.</p>}
           {team.sources?.length > 0 && <p className="team-source-links">Guias consultados: {team.sources.map((source, index) => <span key={source.url}>{index > 0 && ' · '}<a href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a></span>)}</p>}
           {missingSlots.length > 0 && roster.length > 0 && <p className="missing-options">Para completar: {missingSlots.map((slot) => {
             const options = slot.alternatives
@@ -249,8 +360,53 @@ function TeamCard({ team, roster, evaluation, focusCharacterId, isCustomized, on
       <button className="team-action" onClick={onEditRoster}>
         {missingSlots.length ? 'Ver opções para completar' : 'Editar meu elenco'} <span>→</span>
       </button>
+      </div>
     </article>
   );
+}
+
+function TeamCarousel({ rankedTeams, roster, focusCharacterId, teamSlotPreferences, onEditRoster, onOpenTeamBuilds }) {
+  const [selectedTeamId, setSelectedTeamId] = useState('');
+  if (rankedTeams.length === 0) return null;
+
+  const selectedIndex = rankedTeams.findIndex(({ team }) => team.id === selectedTeamId);
+  const currentIndex = selectedIndex >= 0 ? selectedIndex : 0;
+  const current = rankedTeams[currentIndex];
+  const move = (direction) => {
+    const nextIndex = (currentIndex + direction + rankedTeams.length) % rankedTeams.length;
+    setSelectedTeamId(rankedTeams[nextIndex].team.id);
+  };
+
+  return <section className="team-carousel" aria-label="Times cadastrados">
+    <div className="team-carousel-controls">
+      <label htmlFor="team-carousel-select">Escolher time
+        <select id="team-carousel-select" value={current.team.id} onChange={(event) => setSelectedTeamId(event.target.value)}>
+          {rankedTeams.map(({ team, evaluation }) => {
+            const complete = evaluation.coveredCount === team.slots.length;
+            const status = !roster.length ? '' : complete ? ' · completo' : ` · ${evaluation.coveredCount}/${team.slots.length}`;
+            return <option key={team.id} value={team.id}>{team.title}{status}</option>;
+          })}
+        </select>
+      </label>
+      <div className="team-carousel-pagination">
+        <button type="button" onClick={() => move(-1)} aria-label="Ver time anterior" disabled={rankedTeams.length < 2}>← Anterior</button>
+        <span aria-live="polite">{currentIndex + 1} de {rankedTeams.length}</span>
+        <button type="button" onClick={() => move(1)} aria-label="Ver próximo time" disabled={rankedTeams.length < 2}>Próximo →</button>
+      </div>
+    </div>
+    <div className="team-carousel-slide" key={current.team.id}>
+      <TeamCard
+        team={current.team}
+        roster={roster}
+        evaluation={teamSlotPreferences[current.team.id] ? evaluateTeam(current.team, roster, focusCharacterId, teamSlotPreferences[current.team.id]) : current.evaluation}
+        focusCharacterId={focusCharacterId}
+        isCustomized={Boolean(teamSlotPreferences[current.team.id] && Object.keys(teamSlotPreferences[current.team.id]).length)}
+        onEditRoster={onEditRoster}
+        onOpenTeamBuilds={onOpenTeamBuilds}
+        featured
+      />
+    </div>
+  </section>;
 }
 
 function TeamBuildWorkspace({ team, roster, evaluation, slotPreferences, selectedCharacterId, onSelectCharacter, onSetSlotPreference, onResetSlotPreferences, onBack, ownedWeapons, goals, onToggleWeapon, onAddBuildGoal, onOpenBuilds }) {
@@ -264,6 +420,7 @@ function TeamBuildWorkspace({ team, roster, evaluation, slotPreferences, selecte
     || members.find(({ character }) => character);
   const selectedCharacter = selectedMember?.character;
   const reactionOpportunities = getTeamReactionOpportunities(evaluation.lineup);
+  const roleCoverage = getTeamRoleCoverage(evaluation.lineup);
 
   return <section className="team-build-workspace" id="team-build-workspace" aria-labelledby="team-build-workspace-title">
     <div className="team-build-workspace-heading">
@@ -273,7 +430,16 @@ function TeamBuildWorkspace({ team, roster, evaluation, slotPreferences, selecte
       <p>{team.subtitle}</p>
       <div className="team-build-context">{team.tags.map((tag) => <span key={tag}>{tag}</span>)}<span>{evaluation.coveredCount}/{team.slots.length} integrantes no seu elenco</span></div>
       {members.some(({ selection }) => selection?.kind === 'alternative') && <p className="team-build-alternatives">{members.filter(({ selection }) => selection?.kind === 'alternative').map(({ character, slot }) => `${character.name} substitui ${getCharacter(slot.characterId)?.name}`).join(' · ')}</p>}
-      {members.some(({ selection }) => selection?.kind === 'custom') && <p className="team-build-alternatives">Escolhas manuais: {members.filter(({ selection }) => selection?.kind === 'custom').map(({ character, slot }) => `${character.name} em ${slot.role}`).join(' · ')}. A função na posição e a rotação não são avaliadas.</p>}
+      {members.some(({ selection }) => selection?.kind === 'custom') && <p className="team-build-alternatives">Trocas manuais: {members.filter(({ selection }) => selection?.kind === 'custom').map(({ character, slot }) => `${character.name} (${character.role}) em ${slot.role}`).join(' · ')}. O papel é uma classificação geral do personagem; a adequação à posição e a rotação não são calculadas.</p>}
+      <div className="team-role-summary" aria-label="Funções registradas na formação">
+        <strong>Funções cadastradas</strong>
+        <div className="team-role-list">
+          {roleCoverage.roles.map(({ key, label, count }) => <span key={key}>{label} · {count}</span>)}
+          {roleCoverage.unclassified > 0 && <span>Sem guia · {roleCoverage.unclassified}</span>}
+          {roleCoverage.vacancies > 0 && <span>Vagas · {roleCoverage.vacancies}</span>}
+        </div>
+        <small>É a classificação geral disponível para cada personagem; não confirma se ele cumpre essa função no time.</small>
+      </div>
       <div className="team-reaction-summary" aria-live="polite">
         <strong>Combinações elementais possíveis</strong>
         {reactionOpportunities.length > 0
@@ -1169,11 +1335,18 @@ export default function App() {
 
         <section className="recommendations-section" id="recommendations">
           <div className="section-heading">
-            <div><div className="section-kicker">TRAÇANDO A ROTA <span>✧</span></div><h2>Times para explorar</h2><p>Ideias de composição com alternativas conforme o seu elenco.</p></div>
+            <div><div className="section-kicker">TRAÇANDO A ROTA <span>✧</span></div><h2>Times para explorar</h2><p>Explore uma formação por vez e compare as opções para o seu elenco.</p></div>
             <div className="recommendation-count"><strong>{String(rankedTeams.length).padStart(2, '0')}</strong><span>ROTAS<br />SUGERIDAS</span></div>
           </div>
           <div className="roster-notice"><div className="notice-icon">✧</div><div><strong>{roster.length ? `${roster.length} personagens no seu elenco` : 'Primeiro, marque quem você já tem'}</strong><span>{roster.length ? 'Os times estão ordenados pelos que você consegue montar; substitutos e posições em falta ficam indicados.' : 'Marque seus personagens para ordenar os times por compatibilidade e ver quem pode substituir quem.'}</span></div><button onClick={() => goTo(navItems[1])}>{roster.length ? 'Editar elenco' : 'Selecionar elenco'} <span>→</span></button></div>
           {roster.length > 0 && <div className="team-focus-control"><label htmlFor="team-focus-character">Montar com foco em<select id="team-focus-character" value={teamFocusCharacterId} onChange={(event) => setTeamFocusCharacterId(event.target.value)}><option value="">Qualquer personagem</option>{focusCharacters.map((character) => <option key={character.id} value={character.id}>{character.name}</option>)}</select></label><span>{teamFocusCharacterId ? 'Mostrando apenas composições cadastradas que incluem este personagem.' : 'Escolha alguém do seu elenco para encontrar composições onde essa pessoa participa.'}</span></div>}
+          <TeamAiAssistant
+            rankedTeams={rankedTeams}
+            roster={roster}
+            authenticated={Boolean(supabase && session?.user)}
+            enabled={Boolean(supabase && session?.user && roster.length > 0 && loadedProfileUserId === session.user.id)}
+            onOpenTeamBuilds={openTeamBuilds}
+          />
           {selectedBuildTeamId ? (() => {
             const selected = rankedTeams.find(({ team }) => team.id === selectedBuildTeamId);
             return selected && <TeamBuildWorkspace
@@ -1193,7 +1366,14 @@ export default function App() {
               onOpenBuilds={() => goTo(navItems[2])}
             />;
           })() : rankedTeams.length > 0
-            ? <div className="team-grid">{rankedTeams.map(({ team, evaluation }) => <TeamCard key={team.id} team={team} roster={roster} evaluation={teamSlotPreferences[team.id] ? evaluateTeam(team, roster, teamFocusCharacterId, teamSlotPreferences[team.id]) : evaluation} focusCharacterId={teamFocusCharacterId} isCustomized={Boolean(teamSlotPreferences[team.id] && Object.keys(teamSlotPreferences[team.id]).length)} onEditRoster={() => goTo(navItems[1])} onOpenTeamBuilds={openTeamBuilds} />)}</div>
+            ? <TeamCarousel
+              rankedTeams={rankedTeams}
+              roster={roster}
+              focusCharacterId={teamFocusCharacterId}
+              teamSlotPreferences={teamSlotPreferences}
+              onEditRoster={() => goTo(navItems[1])}
+              onOpenTeamBuilds={openTeamBuilds}
+            />
             : <div className="empty-state team-focus-empty"><strong>Ainda não há um time cadastrado com {getCharacter(teamFocusCharacterId)?.name}.</strong><p>Os guias atuais cobrem algumas composições iniciais. Limpe o foco para ver todos os times ou escolha outro personagem do elenco.</p><button type="button" onClick={() => setTeamFocusCharacterId('')}>Ver todos os times</button></div>}
           <div className="data-note"><span>ⓘ</span> Builds são uma curadoria inicial baseada nos guias KQM; confirme requisitos de Recarga e ajuste à sua equipe. Algumas trocas alteram a rotação ou o desempenho.</div>
         </section></>}

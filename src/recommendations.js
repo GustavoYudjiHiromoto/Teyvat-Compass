@@ -29,6 +29,34 @@ export function getTeamReactionOpportunities(lineup) {
   return reactions;
 }
 
+export function getTeamRoleCoverage(lineup) {
+  const roles = [
+    { key: 'DPS', label: 'DPS' },
+    { key: 'Sub DPS', label: 'Sub DPS' },
+    { key: 'Suporte', label: 'Suporte' },
+    { key: 'Healer', label: 'Cura' },
+  ];
+  const counts = Object.fromEntries(roles.map(({ key }) => [key, 0]));
+  let unclassified = 0;
+  let vacancies = 0;
+
+  for (const selection of lineup) {
+    if (!selection?.character) {
+      vacancies += 1;
+      continue;
+    }
+
+    if (Object.hasOwn(counts, selection.character.role)) counts[selection.character.role] += 1;
+    else unclassified += 1;
+  }
+
+  return {
+    roles: roles.map(({ key, label }) => ({ key, label, count: counts[key] })).filter(({ count }) => count > 0),
+    unclassified,
+    vacancies,
+  };
+}
+
 export function evaluateTeam(team, roster, focusCharacterId = null, slotPreferences = {}) {
   let best = { lineup: [], coveredCount: -1, coreCount: -1, includesFocus: false };
 

@@ -1,2 +1,5 @@
 [functions.enka-showcase]
 verify_jwt = true
+
+[functions.team-assistant]
+verify_jwt = true

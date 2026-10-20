@@ -34,12 +34,18 @@ O modo sem configuração continua funcionando localmente. Para habilitar cadast
 5. Para habilitar a importação de Showcase, instale e autentique o [Supabase CLI](https://supabase.com/docs/guides/cli), vincule o projeto (`supabase link --project-ref SEU_PROJECT_REF`) e publique a função: `supabase functions deploy enka-showcase`. Execute o deploy novamente após atualizar a função.
 6. Reinicie `npm run dev` e use o menu no topo para criar uma conta ou entrar.
 
+### Assistente de times com OpenRouter
+
+O assistente exige login, compara apenas formações já cadastradas e permite até 5 consultas por usuário por dia. No Supabase, execute novamente `supabase/schema.sql` para instalar o contador diário e a função segura de limite; depois, em **Project Settings → Edge Functions → Secrets**, adicione `OPENROUTER_API_KEY`. O modelo padrão é `openai/gpt-4.1-mini`; você pode definir `OPENROUTER_MODEL` para outro modelo que aceite JSON Schema. O limite de preço por chamada é de US$ 0,50/M tokens de entrada e US$ 2,00/M tokens de saída. Publique com `supabase functions deploy team-assistant`.
+
+Cada solicitação envia somente o elenco, até oito formações candidatas e uma preferência de até 240 caracteres. A resposta fica limitada a 420 tokens, o roteamento recusa provedores acima de US$ 0,50 por milhão de tokens de entrada ou US$ 2,00 por milhão de saída, e provedores que permitem coleta de dados são excluídos. Erros HTTP do provedor devolvem a cota diária; se a conexão expirar após o envio, a cota pode ser consumida porque não dá para confirmar se o modelo processou o pedido. Defina um limite de gastos para a chave no painel do OpenRouter como proteção adicional; o limite diário por conta não substitui um teto global de gastos.
+
 No primeiro login sem perfil na nuvem, o elenco, as armas, o Showcase, os objetivos e as formações personalizadas salvos localmente são copiados para a conta. A partir daí, alterações são sincronizadas. A tabela permite que cada usuário leia e altere apenas o próprio perfil. Nunca coloque uma chave `service_role` no frontend; use somente a chave pública.
 
 ## Escopo atual
 
 - Seleção de personagens possuídos com salvamento automático em `localStorage`.
-- Seis sugestões iniciais de time, ranqueadas conforme os personagens marcados no elenco.
+- Sugestões iniciais de time, ranqueadas conforme os personagens marcados no elenco, com um assistente opcional para comparar até oito formações cadastradas.
 - Substitutos por função, sem repetir personagens, com explicação das trocas e posições ainda em falta; você pode escolher uma sugestão avaliada ou qualquer personagem do seu elenco em cada posição e restaurar a sugestão automática. Escolhas manuais não têm sinergia avaliada.
 - Builds iniciais por personagem nos times sugeridos, com armas alternativas, artefatos, atributos e links para os guias da KeqingMains.
 - Marcação de armas possuídas, priorizadas nas recomendações; no modo local os dados ficam salvos neste navegador.
